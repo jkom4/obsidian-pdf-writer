@@ -1,5 +1,5 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-
+import { App, Editor, MarkdownView, WorkspaceLeaf,  Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { PdfViewerView, VIEW_TYPE_PDF } from "./views/PdfViewerView";
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
@@ -14,18 +14,19 @@ export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
 	async onload() {
-		//await this.loadSettings();
-		this.addRibbonIcon('dice', 'Greet', () => {
-			new Notice('Hello, world!');
-		});
+		this.registerView(
+			VIEW_TYPE_PDF,
+			(leaf: WorkspaceLeaf) => new PdfViewerView(leaf)
+		);
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+		// Ajouter une commande pour ouvrir la vue
+		this.addCommand({
+			id: "open-pdf-viewer",
+			name: "Open PDF Viewer",
+			callback: () => {
+				this.activateView();
+			},
 		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
@@ -81,8 +82,16 @@ export default class MyPlugin extends Plugin {
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
-	onunload() {
+	async activateView() {
+		const leaf = this.app.workspace.getLeaf(true);
+		await leaf.setViewState({
+			type: VIEW_TYPE_PDF,
+			active: true,
+		});
+	}
 
+	onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_PDF);
 	}
 
 	async loadSettings() {
