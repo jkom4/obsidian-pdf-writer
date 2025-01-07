@@ -6,5 +6,6 @@
 	"description": "obsidian plugin to write and fill a pdf.",
 	"author": "Jobelin Kom",
 	"authorUrl": "https://github.com/jkom4",
-	"isDesktopOnly": false
+	"isDesktopOnly": false,
+	"css": "styles.css"
 }

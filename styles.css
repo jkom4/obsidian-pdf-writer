@@ -1,8 +1,33 @@
-/*
+.pdf-toolbar {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 5px;
+	background-color: #2e2e2e;
+	color: white;
+	border-bottom: 1px solid #444;
+	z-index: 1000;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.pdf-toolbar-button {
+	margin: 0 5px;
+	padding: 5px 10px;
+	background-color: #444;
+	color: white;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+}
 
-If your plugin does not need CSS, delete this file.
+.pdf-toolbar-button:hover {
+	background-color: #555;
+}
+.text-overlay {
+	position: absolute;
+	background: white;
+	border: 1px solid #ccc;
+	padding: 5px;
+	z-index: 1001;
+	cursor: move;
+}
 
-*/
