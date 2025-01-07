@@ -56,26 +56,6 @@ export default class MyPlugin extends Plugin {
 		});
 
 		console.log("Bouton ajouté à la barre d'outils par défaut.");
-		// Crée la barre d'outils
-		const toolbar = container.createDiv({ cls: "pdf-toolbar" });
-		toolbar.createEl("button", {
-			text: "Ajouter une zone de texte",
-			cls: "pdf-toolbar-button",
-			attr: { "data-action": "add-text" },
-		});
-
-		// Écouteur d'événements pour les boutons
-		toolbar.addEventListener("click", (event) => {
-			const target = event.target as HTMLElement;
-			const action = target.getAttribute("data-action");
-
-			if (action === "add-text") {
-				console.log("Ajout d'une zone de texte...");
-				this.addTextZone();
-			}
-		});
-
-		console.log("Barre d'outils ajoutée au PDF Viewer.");
 	}
 
 	addTextZone() {
@@ -97,8 +77,31 @@ export default class MyPlugin extends Plugin {
 		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
 		overlay.style.border = "1px solid #ccc";
 
+		//Controler la position du textarea
+		overlay.addEventListener("mousedown", (event) => {
+			let isDragging = true;
+			const offsetX = event.offsetX;
+			const offsetY = event.offsetY;
+
+			const onMouseMove = (e: MouseEvent) => {
+				if (!isDragging) return;
+				overlay.style.left = `${e.pageX - offsetX}px`;
+				overlay.style.top = `${e.pageY - offsetY}px`;
+			};
+
+			const onMouseUp = () => {
+				isDragging = false;
+				document.removeEventListener("mousemove", onMouseMove);
+				document.removeEventListener("mouseup", onMouseUp);
+			};
+
+			document.addEventListener("mousemove", onMouseMove);
+			document.addEventListener("mouseup", onMouseUp);
+		});
+
 		console.log("Zone de texte ajoutée.");
 	}
+
 
 
 	onunload() {
