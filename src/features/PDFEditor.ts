@@ -16,8 +16,7 @@ export default class PDFEditor {
 			color: rgb(0, 0, 0),
 		});
 
-		const modifiedPdfBytes = await pdfDoc.save();
-		return modifiedPdfBytes;
+		return await pdfDoc.save();
 	}
 }
 
