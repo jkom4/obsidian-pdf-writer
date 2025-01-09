@@ -10,7 +10,7 @@ export default class TextZoneManager {
 		this.plugin = plugin;
 	}
 
-	addTextZone() {
+	addTextZone(fontSize: string, fontFamily: string, color: string) {
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
 			console.warn("No active or supported file view.");
@@ -29,10 +29,27 @@ export default class TextZoneManager {
 		overlay.style.border = "1px solid #ccc";
 		overlay.style.cursor = "move";
 
+		// Apply custom styles
+		overlay.style.fontSize = fontSize || "14px";
+		overlay.style.fontFamily = fontFamily || "Arial";
+		overlay.style.color = color || "black";
+
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
-		overlay.addEventListener("blur", () => this.finalizeTextZone(overlay));
+		//overlay.addEventListener("blur", () => this.finalizeTextZone(overlay));
+		// Ajouter un événement global pour détecter les clics dans le document
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as HTMLElement;
 
+			// Vérifier si le clic est en dehors de la zone de texte et de la barre d'outils
+			if (!overlay.contains(target) && !target.closest(".pdf-toolbar")) {
+				console.log("ok")
+				this.finalizeTextZone(overlay);
+
+			}
+		};
+
+		document.addEventListener("click", handleClickOutside);
 		console.log("Text zone added.");
 	}
 
@@ -89,5 +106,32 @@ export default class TextZoneManager {
 		overlay.style.cursor = "default";
 
 		console.log("Text zone finalized.");
+	}
+	/**
+	 * Applies the selected style (fontSize, fontFamily, or color) to the currently selected text.
+	 */
+	applyStyleToSelection(styleType: string, value: string) {
+		const selection = window.getSelection();
+		if (!selection || selection.rangeCount === 0) {
+			console.warn("No text selected.");
+			return;
+		}
+
+		const range = selection.getRangeAt(0);
+
+		// Create a span to wrap the selected text with the style
+		const span = document.createElement("span");
+		if (styleType === "fontSize") {
+			span.style.fontSize = value;
+		} else if (styleType === "fontFamily") {
+			span.style.fontFamily = value;
+		} else if (styleType === "color") {
+			span.style.color = value;
+		}
+
+		// Wrap the selected text with the styled span
+		range.surroundContents(span);
+
+		console.log(`Applied ${styleType}: ${value} to the selected text.`);
 	}
 }
