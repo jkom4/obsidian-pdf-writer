@@ -11,6 +11,7 @@ export default class TextZoneManager {
 	}
 
 	addTextZone(fontSize: string, fontFamily: string, color: string) {
+
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
 			console.warn("No active or supported file view.");
@@ -28,6 +29,7 @@ export default class TextZoneManager {
 		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
 		overlay.style.border = "1px solid #ccc";
 		overlay.style.cursor = "move";
+
 
 		// Apply custom styles
 		overlay.style.fontSize = fontSize || "14px";
@@ -107,6 +109,7 @@ export default class TextZoneManager {
 
 		console.log("Text zone finalized.");
 	}
+
 	/**
 	 * Applies the selected style (fontSize, fontFamily, or color) to the currently selected text.
 	 */
@@ -134,4 +137,5 @@ export default class TextZoneManager {
 
 		console.log(`Applied ${styleType}: ${value} to the selected text.`);
 	}
+
 }

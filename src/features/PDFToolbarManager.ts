@@ -25,6 +25,7 @@ export default class PDFToolbarManager {
 			console.warn("Default toolbar not found.");
 			return;
 		}
+)
 		// Create a dropdown for font size
 		const fontSizeDropdown = defaultToolbar.createEl("select", { cls: "font-size-dropdown" });
 		["12px", "14px", "16px", "18px", "20px", "24px"].forEach(size => {
@@ -43,6 +44,7 @@ export default class PDFToolbarManager {
 			cls: "text-color-picker",
 		});
 
+    //Create button to add text Area
 		const newButton = defaultToolbar.createEl("button", {
 			text: "Add Text Zone",
 			cls: "custom-toolbar-button",
@@ -59,7 +61,5 @@ export default class PDFToolbarManager {
 		fontSizeDropdown.addEventListener("change", () => new TextZoneManager(this.plugin).applyStyleToSelection("fontSize", fontSizeDropdown.value));
 		fontFamilyDropdown.addEventListener("change", () => new TextZoneManager(this.plugin).applyStyleToSelection("fontFamily", fontFamilyDropdown.value));
 		colorPicker.addEventListener("input", () => new TextZoneManager(this.plugin).applyStyleToSelection("color", colorPicker.value));
-
-		console.log("Toolbar updated with text customization options.");
 	}
 }
