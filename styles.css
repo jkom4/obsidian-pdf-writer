@@ -22,13 +22,36 @@
 .pdf-toolbar-button:hover {
 	background-color: #555;
 }
+/*.text-overlay {*/
+/*	position: absolute;*/
+/*	background: white;*/
+/*	border: 1px solid #ccc;*/
+/*	padding: 5px;*/
+/*	cursor: move;*/
+/*	z-index: 10; !* S'assurer qu'il est au-dessus du contenu PDF *!*/
+/*	pointer-events: auto; !* Permettre les clics sur le texte *!*/
+/*}*/
 .text-overlay {
+	z-index: 10;
+	pointer-events: auto;
+	font-size: 14px;
+	resize: none;
+	background-color: rgba(255, 255, 255, 0.8); /* Apparence semi-transparente */
+	border: 2px dashed #0078d7; /* Contour en pointillé bleu */
+	border-radius: 4px; /* Coins arrondis */
+	cursor: move; /* Icône de déplacement */
+}
+
+.text-overlay .drag-handle {
 	position: absolute;
-	background: white;
-	border: 1px solid #ccc;
-	padding: 5px;
-	z-index: 1001;
-	cursor: move;
+	right: -10px; /* Position sur le bord droit */
+	top: 50%; /* Centré verticalement */
+	width: 10px;
+	height: 20px;
+	background-color: #0078d7; /* Bleu pour ressembler à Edge */
+	cursor: grab; /* Icône pour saisir la poignée */
+	border-radius: 2px;
+	transform: translateY(-50%); /* Centrage vertical ajusté */
 }
 .custom-text-zone {
 	font-family: Arial, sans-serif;
