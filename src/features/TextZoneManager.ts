@@ -10,32 +10,47 @@ export default class TextZoneManager {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * Adds a new text zone to the PDF.
+	 * @param fontSize - The font size of the text zone.
+	 * @param fontFamily - The font family of the text zone.
+	 * @param color - The text color of the text zone.
+	 */
 	addTextZone(fontSize: string, fontFamily: string, color: string) {
-
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
 			console.warn("No active or supported file view.");
 			return;
 		}
 
-		const container = activeLeaf.containerEl;
+		const container = activeLeaf.containerEl.querySelector(".page");
+		if (!container) {
+			console.warn("No active or supported file view.");
+			return;
+		}
+
+		// Create the text zone (editable div)
 		const overlay = container.createDiv({ cls: "text-overlay", text: "Text here" });
 
+
+		// Set initial styles for the text zone
 		overlay.setAttr("contenteditable", "true");
 		overlay.style.position = "absolute";
 		overlay.style.top = "50%";
 		overlay.style.left = "50%";
 		overlay.style.padding = "5px";
 		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-		overlay.style.border = "1px solid #ccc";
+		overlay.style.border = "2px dashed #0078d7"; // Initial dotted border
+		overlay.style.borderRadius = "4px"; // Rounded corners
 		overlay.style.cursor = "move";
 
-
-		// Apply custom styles
+		// Apply custom font styles
 		overlay.style.fontSize = fontSize || "14px";
 		overlay.style.fontFamily = fontFamily || "Arial";
 		overlay.style.color = color || "black";
 
+
+		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
 		//overlay.addEventListener("blur", () => this.finalizeTextZone(overlay));
@@ -55,7 +70,10 @@ export default class TextZoneManager {
 		console.log("Text zone added.");
 	}
 
-	handleDrag(event: MouseEvent, overlay: HTMLDivElement, container: HTMLElement) {
+	/**
+	 * Handles dragging of the text zone.
+	 */
+	handleDrag(event: MouseEvent, overlay: HTMLDivElement, container: Element) {
 		if ((event.target as HTMLElement).isContentEditable) return;
 
 		event.preventDefault();
@@ -85,13 +103,19 @@ export default class TextZoneManager {
 		document.addEventListener("mouseup", onMouseUp);
 	}
 
+	/**
+	 * Enables editing of the text zone.
+	 */
 	enableTextEditing(overlay: HTMLDivElement) {
 		overlay.setAttr("contenteditable", "true");
-		overlay.style.border = "1px solid #000";
+		overlay.style.border = "2px dashed #0078d7"; // Add dotted border on double click
 		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
 		overlay.focus();
 	}
 
+	/**
+	 * Finalizes the text zone by removing the border and disabling editing.
+	 */
 	finalizeTextZone(overlay: HTMLDivElement) {
 		const textContent = overlay.innerText.trim();
 
@@ -102,8 +126,8 @@ export default class TextZoneManager {
 		}
 
 		overlay.setAttr("contenteditable", "false");
+		overlay.style.border = "none"; // Remove border on click outside
 		overlay.style.backgroundColor = "transparent";
-		overlay.style.border = "none";
 		overlay.style.padding = "0";
 		overlay.style.cursor = "default";
 
@@ -137,5 +161,4 @@ export default class TextZoneManager {
 
 		console.log(`Applied ${styleType}: ${value} to the selected text.`);
 	}
-
 }
