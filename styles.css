@@ -75,3 +75,34 @@
 	user-select: none;
 }
 
+.delete-button {
+	position: absolute;
+	top: -20px; /* Ajuste selon ton design */
+	right: -20px; /* Ajuste selon ton design */
+	background-color: #ff4d4d; /* Couleur de fond du bouton */
+	color: white; /* Couleur de l'icône */
+	border: none; /* Supprime la bordure */
+	border-radius: 20%; /* Rendre le bouton rond */
+	cursor: pointer; /* Curseur de la souris */
+	width: 30px; /* Largeur du bouton */
+	height: 30px; /* Hauteur du bouton */
+	display: flex; /* Utiliser Flexbox */
+	justify-content: center; /* Centrer horizontalement l'icône */
+	align-items: center; /* Centrer verticalement l'icône */
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Ombre pour un effet 3D */
+	transition: transform 0.2s, box-shadow 0.2s; /* Animations */
+	font-size: 16px; /* Taille de l'icône */
+	line-height: 1; /* Empêcher tout décalage */
+}
+
+.delete-button:hover {
+	transform: scale(1.2); /* Agrandir légèrement au survol */
+	box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* Augmenter l'ombre */
+	background: #ff0000; /* Couleur rouge plus vive */
+}
+
+.delete-button:active {
+	transform: scale(1); /* Réduction lors du clic */
+	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Ombre réduite */
+}
+
