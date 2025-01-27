@@ -1,13 +1,15 @@
-import {  Plugin, FileView } from 'obsidian';
+import { FileView } from 'obsidian';
 import TextZoneManager from "./TextZoneManager";
+import {PdfExporter} from "./PdfExporter";
+import MyPlugin from "../main";
 
 /**
  * Manages the toolbar for the PDF viewer.
  */
 export default class PDFToolbarManager {
-	plugin: Plugin;
+	plugin: MyPlugin;
 
-	constructor(plugin: Plugin) {
+	constructor(plugin: MyPlugin) {
 		this.plugin = plugin;
 	}
 
@@ -25,7 +27,6 @@ export default class PDFToolbarManager {
 			console.warn("Default toolbar not found.");
 			return;
 		}
-)
 		// Create a dropdown for font size
 		const fontSizeDropdown = defaultToolbar.createEl("select", { cls: "font-size-dropdown" });
 		["12px", "14px", "16px", "18px", "20px", "24px"].forEach(size => {
@@ -44,7 +45,7 @@ export default class PDFToolbarManager {
 			cls: "text-color-picker",
 		});
 
-    //Create button to add text Area
+		//Create button to add text Area
 		const newButton = defaultToolbar.createEl("button", {
 			text: "Add Text Zone",
 			cls: "custom-toolbar-button",
@@ -54,8 +55,26 @@ export default class PDFToolbarManager {
 			console.log("Adding a text zone...");
 			new TextZoneManager(this.plugin).addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
 		});
-
 		console.log("Button added to the default toolbar.");
+
+		//Create button to export pdf
+		const exportButton = defaultToolbar.createEl("button", {
+			text: "Export PDF",
+			cls: "custom-toolbar-button",
+		});
+
+		exportButton.addEventListener("click", async () => {
+			// Vérifier que le PDF actuel est chargé
+			if (!this.plugin.currentPdfBytes) {
+				alert("No PDF is currently loaded!");
+				return;
+			}
+
+			// Exporter le PDF avec les modifications
+			const exporter = new PdfExporter(this.plugin.currentPdfBytes);
+			await exporter.exportPdfWithTextZones();
+		});
+
 
 		// Event listeners for applying styles to the selected text
 		fontSizeDropdown.addEventListener("change", () => new TextZoneManager(this.plugin).applyStyleToSelection("fontSize", fontSizeDropdown.value));

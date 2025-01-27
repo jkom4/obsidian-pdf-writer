@@ -1,12 +1,12 @@
-import { Plugin, FileView } from 'obsidian';
-
+import { FileView } from 'obsidian';
+import MyPlugin from "../main";
 /**
  * Manages text zones added to the PDF.
  */
 export default class TextZoneManager {
-	plugin: Plugin;
+	plugin: MyPlugin;
 
-	constructor(plugin: Plugin) {
+	constructor(plugin: MyPlugin) {
 		this.plugin = plugin;
 	}
 
@@ -28,10 +28,18 @@ export default class TextZoneManager {
 			console.warn("No active or supported file view.");
 			return;
 		}
-
 		// Create the text zone (editable div)
 		const overlay = container.createDiv({ cls: "text-overlay", text: "Text here" });
 
+		// Create the delete button
+		const deleteButton = document.createElement("button");
+		deleteButton.innerHTML = "&#128465;"; // Bin icon
+		deleteButton.classList.add("delete-button");
+		deleteButton.style.display = "none";  // Hidden by default
+		deleteButton.contentEditable="false"
+
+		// Append the delete button to the text zone
+		overlay.appendChild(deleteButton);
 
 		// Set initial styles for the text zone
 		overlay.setAttr("contenteditable", "true");
@@ -49,25 +57,31 @@ export default class TextZoneManager {
 		overlay.style.fontFamily = fontFamily || "Arial";
 		overlay.style.color = color || "black";
 
-
 		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
-		//overlay.addEventListener("blur", () => this.finalizeTextZone(overlay));
+		overlay.addEventListener("dblclick", () => deleteButton.style.display = "block");
+		overlay.addEventListener("mouseleave", () => deleteButton.style.display = "none");
+
+		// Delete button functionality
+		deleteButton.addEventListener("click", (event) => {
+			event.stopPropagation(); // Prevent triggering other events
+			overlay.remove();
+		});
+
+
+
 		// Ajouter un événement global pour détecter les clics dans le document
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
 
 			// Vérifier si le clic est en dehors de la zone de texte et de la barre d'outils
 			if (!overlay.contains(target) && !target.closest(".pdf-toolbar")) {
-				console.log("ok")
 				this.finalizeTextZone(overlay);
-
 			}
 		};
 
 		document.addEventListener("click", handleClickOutside);
-		console.log("Text zone added.");
 	}
 
 	/**
@@ -121,7 +135,6 @@ export default class TextZoneManager {
 
 		if (!textContent) {
 			overlay.remove();
-			console.log("Text zone removed as it was empty.");
 			return;
 		}
 
@@ -130,8 +143,6 @@ export default class TextZoneManager {
 		overlay.style.backgroundColor = "transparent";
 		overlay.style.padding = "0";
 		overlay.style.cursor = "default";
-
-		console.log("Text zone finalized.");
 	}
 
 	/**
@@ -161,4 +172,5 @@ export default class TextZoneManager {
 
 		console.log(`Applied ${styleType}: ${value} to the selected text.`);
 	}
+
 }
