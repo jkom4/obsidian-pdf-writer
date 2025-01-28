@@ -33,6 +33,7 @@ export default class PDFToolbarManager {
 			fontSizeDropdown.createEl("option", { text: size, value: size });
 		});
 
+
 		// Create a dropdown for font family
 		const fontFamilyDropdown = defaultToolbar.createEl("select", { cls: "font-family-dropdown" });
 		["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia"].forEach(font => {
@@ -46,12 +47,16 @@ export default class PDFToolbarManager {
 		});
 
 		//Create button to add text Area
-		const newButton = defaultToolbar.createEl("button", {
-			text: "Add Text Zone",
+		const addTextButton = defaultToolbar.createEl("button", {
 			cls: "custom-toolbar-button",
 		});
-
-		newButton.addEventListener("click", () => {
+		addTextButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true" focusable="false" viewBox="0 0 512 512">
+    <path
+      fill="currentColor"
+      d="M254 52.8C249.3 40.3 237.3 32 224 32s-25.3 8.3-30 20.8L57.8 416 32 416c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-1.8 0 18-48 159.6 0 18 48-1.8 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-25.8 0L254 52.8zM279.8 304l-111.6 0L224 155.1 279.8 304z"
+    />
+  </svg>`;
+		addTextButton.addEventListener("click", () => {
 			console.log("Adding a text zone...");
 			new TextZoneManager(this.plugin).addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
 		});
@@ -59,9 +64,14 @@ export default class PDFToolbarManager {
 
 		//Create button to export pdf
 		const exportButton = defaultToolbar.createEl("button", {
-			text: "Export PDF",
 			cls: "custom-toolbar-button",
 		});
+		exportButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="icon" aria-hidden="true" focusable="false" viewBox="0 0 512 512">
+    <path
+      fill="currentColor"
+      d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"
+    />
+  </svg>`;
 
 		exportButton.addEventListener("click", async () => {
 			// Vérifier que le PDF actuel est chargé

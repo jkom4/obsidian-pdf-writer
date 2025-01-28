@@ -7,6 +7,8 @@
 	color: white;
 	border-bottom: 1px solid #444;
 	z-index: 1000;
+	gap: 0.5rem;
+	margin-right: 1rem;
 }
 
 .pdf-toolbar-button {
@@ -22,6 +24,12 @@
 .pdf-toolbar-button:hover {
 	background-color: #555;
 }
+.icon {
+	width: 20px;
+	height: 20px;
+	vertical-align: -0.125em;
+}
+
 /*.text-overlay {*/
 /*	position: absolute;*/
 /*	background: white;*/
