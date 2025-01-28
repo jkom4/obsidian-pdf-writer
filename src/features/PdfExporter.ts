@@ -22,17 +22,27 @@ export class PdfExporter {
 
 			textZones.forEach((textZone) => {
 				const deleteButton = textZone.querySelector(".delete-button");
-				// @ts-ignore
-				textZone.removeChild(deleteButton);
+				if (deleteButton) {
+					textZone.removeChild(deleteButton);
+				}
 				const text = textZone.textContent || "";
+
+				// Récupérer les styles appliqués dynamiquement (fontSize, fontFamily, color)
+				const fontSize = window.getComputedStyle(textZone).fontSize.replace("px", ""); // Extraire uniquement le chiffre
+				const fontFamily = window.getComputedStyle(textZone).fontFamily;
+				const color = window.getComputedStyle(textZone).color;
+
+				// Convertir la couleur en RGB
+				const rgbMatch = color.match(/\d+/g);
+				const [r, g, b] = rgbMatch ? rgbMatch.map(Number) : [0, 0, 0]; // Noir par défaut
 				const { x, y, width, height } = textZone.getBoundingClientRect();
 
 				// Ajouter le texte à la position correspondante
 				firstPage.drawText(text, {
 					x: x, // Position X
 					y: firstPage.getHeight() - y - height, // Calculer Y en inversant l'axe
-					size: 12,
-					color: rgb(0, 0, 0), // Couleur noire
+					size:  parseFloat(fontSize) || 12,
+					color: rgb(r / 255, g / 255, b / 255), // Couleur noire
 				});
 			});
 
