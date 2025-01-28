@@ -53,9 +53,9 @@ export default class TextZoneManager {
 		overlay.style.cursor = "move";
 
 		// Apply custom font styles
-		overlay.style.fontSize = fontSize || "14px";
-		overlay.style.fontFamily = fontFamily || "Arial";
-		overlay.style.color = color || "black";
+		overlay.style.fontSize = fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px";
+		overlay.style.fontFamily = fontFamily || this.plugin.settingsManager.settings.defaultFontFamily || "Arial";
+		overlay.style.color = color || this.plugin.settingsManager.settings.defaultTextColor || "black";
 
 		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
@@ -169,8 +169,6 @@ export default class TextZoneManager {
 
 		// Wrap the selected text with the styled span
 		range.surroundContents(span);
-
-		console.log(`Applied ${styleType}: ${value} to the selected text.`);
 	}
 
 }
