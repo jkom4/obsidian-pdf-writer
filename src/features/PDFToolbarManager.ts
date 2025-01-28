@@ -32,6 +32,8 @@ export default class PDFToolbarManager {
 		["12px", "14px", "16px", "18px", "20px", "24px"].forEach(size => {
 			fontSizeDropdown.createEl("option", { text: size, value: size });
 		});
+		// Set default value for font size
+		fontSizeDropdown.value = this.plugin.settingsManager.settings.defaultFontSize || "16px"; // Use the saved value or fallback to "16px"
 
 
 		// Create a dropdown for font family
@@ -39,12 +41,17 @@ export default class PDFToolbarManager {
 		["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia"].forEach(font => {
 			fontFamilyDropdown.createEl("option", { text: font, value: font });
 		});
+		// Set default value for font family
+		fontFamilyDropdown.value = this.plugin.settingsManager.settings.defaultFontFamily || "Arial"; // Use the saved value or fallback to "Arial"
+
 
 		// Create a color picker
 		const colorPicker = defaultToolbar.createEl("input", {
 			type: "color",
 			cls: "text-color-picker",
 		});
+		// Set default value for color picker
+		colorPicker.value = this.plugin.settingsManager.settings.defaultTextColor || "#000000"; // Use the saved value or fallback to black
 
 		//Create button to add text Area
 		const addTextButton = defaultToolbar.createEl("button", {

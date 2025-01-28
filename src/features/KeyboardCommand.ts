@@ -4,7 +4,6 @@ export class KeyboardCommand {
 	private plugin: MyPlugin;
 
 	constructor(plugin: MyPlugin) {
-		console.log("Initializing KeyboardCommand...");
 		this.plugin = plugin;
 		this.registerKeyCommands();
 	}

@@ -8,7 +8,6 @@ export class PdfExporter {
 	}
 
 	async exportPdfWithTextZones(): Promise<void> {
-		console.log("Exporting the currently loaded PDF with text zones...");
 
 		try {
 			// Charger le fichier PDF actuel
@@ -46,9 +45,8 @@ export class PdfExporter {
 			link.href = URL.createObjectURL(blob);
 			link.download = "modified-document.pdf";
 			link.click();
-
-			console.log("PDF exported successfully!");
 		} catch (error) {
+			alert("Error exporting PDF");
 			console.error("Error exporting PDF:", error);
 		}
 	}
