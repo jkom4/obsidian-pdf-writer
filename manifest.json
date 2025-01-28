@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-pdf-writer",
+	"id": "pdf-writer",
 	"name": "PDF Writer",
 	"version": "0.10.1",
 	"minAppVersion": "0.15.0",
-	"description": "obsidian plugin to write and fill a pdf.",
+	"description": "to write and fill a pdf.",
 	"author": "Jobelin Kom",
 	"authorUrl": "https://github.com/jkom4",
 	"isDesktopOnly": false,
