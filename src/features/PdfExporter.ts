@@ -29,7 +29,6 @@ export class PdfExporter {
 
 				// Récupérer les styles appliqués dynamiquement (fontSize, fontFamily, color)
 				const fontSize = window.getComputedStyle(textZone).fontSize.replace("px", ""); // Extraire uniquement le chiffre
-				const fontFamily = window.getComputedStyle(textZone).fontFamily;
 				const color = window.getComputedStyle(textZone).color;
 
 				// Convertir la couleur en RGB
