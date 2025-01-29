@@ -34,8 +34,8 @@ Although fully functional, you may encounter:
 We're actively working on :  
 - Full support for custom fonts 🎨    
 - Smarter positioning and scaling 💡
-- - Improved UX for even more user-friendly interfaces 🔍
-Stay updated on progress → [GitHub Repository](https://github.com/jkom4/obsidian-pdf-writer)
+- Improved UX for even more user-friendly interfaces 🔍
+Stay updated on progress →  [GitHub Repository](https://github.com/jkom4/obsidian-pdf-writer)
 ---
 
 ## 📥 Installation
@@ -93,7 +93,7 @@ If you encounter any issues or need assistance:
 If you find this plugin useful, please consider leaving a ⭐ on the [repository](https://github.com/jkom4/obsidian-pdf-writer)! It helps the project grow and reach more users.
 
 Found a bug? Have feature ideas?
-📧 [My Email](jkom4dev@gmail.com)
+📧 [My Email](mailto://jkom4dev@gmail.com)
 
 ---
 
