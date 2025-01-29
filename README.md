@@ -17,6 +17,26 @@ Here’s a README tailored for your GitHub repository, covering all the requeste
 - Simple and intuitive settings for customization.
 
 ---
+## 🚧 Work in progress notice 📝
+
+⚠️ **Heads Up!** This plugin is currently in beta development.  
+Although fully functional, you may encounter:
+
+- Occasional problems with text positioning on the PDF .
+- Limited support for colored fonts (best results with black/dark text).
+- Slight variations in overlay accuracy depending on PDF resolution.
+
+### Optimal results when :
+- 📜 Using PDFs with bright, contrasting content.
+- ✍️ Text editing with standard fonts and colors.
+- 💡 Working with clean, high-quality scans.
+
+We're actively working on :  
+- Full support for custom fonts 🎨    
+- Smarter positioning and scaling 💡
+- - Improved UX for even more user-friendly interfaces 🔍
+Stay updated on progress → [GitHub Repository](https://github.com/jkom4/obsidian-pdf-writer)
+---
 
 ## 📥 Installation
 ### From GitHub:
@@ -71,6 +91,9 @@ If you encounter any issues or need assistance:
 
 ## ⭐ Show Your Support
 If you find this plugin useful, please consider leaving a ⭐ on the [repository](https://github.com/jkom4/obsidian-pdf-writer)! It helps the project grow and reach more users.
+
+Found a bug? Have feature ideas?
+📧 [My Email](jkom4dev@gmail.com)
 
 ---
 
