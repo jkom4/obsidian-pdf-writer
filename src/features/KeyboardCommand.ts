@@ -1,9 +1,9 @@
-import MyPlugin from "../main";
+import PDFWriter from "../main";
 
 export class KeyboardCommand {
-	private plugin: MyPlugin;
+	private plugin: PDFWriter;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: PDFWriter) {
 		this.plugin = plugin;
 		this.registerKeyCommands();
 	}

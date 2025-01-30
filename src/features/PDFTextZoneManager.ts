@@ -1,12 +1,14 @@
 import { FileView } from 'obsidian';
-import MyPlugin from "../main";
+import PDFWriter from "../main";
+import {getFontFamilyClass, getFontSizeClass} from "../utils/Styles";
+
 /**
  * Manages text zones added to the PDF.
  */
-export default class TextZoneManager {
-	plugin: MyPlugin;
+export default class PDFTextZoneManager {
+	plugin: PDFWriter;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: PDFWriter) {
 		this.plugin = plugin;
 	}
 
@@ -28,40 +30,31 @@ export default class TextZoneManager {
 			console.warn("No active or supported file view.");
 			return;
 		}
+
 		// Create the text zone (editable div)
 		const overlay = container.createDiv({ cls: "text-overlay", text: "Text here" });
 
 		// Create the delete button
-		const deleteButton = document.createElement("button");
-		deleteButton.innerHTML = "&#128465;"; // Bin icon
-		deleteButton.classList.add("delete-button");
-		deleteButton.style.display = "none";  // Hidden by default
-		deleteButton.contentEditable="false"
+		const deleteButton = createEl("button", { text: "🗑️", cls: "delete-button pdf-delete-button-hidden" });
+		deleteButton.contentEditable = "false";
 
 		// Append the delete button to the text zone
 		overlay.appendChild(deleteButton);
 
-		// Set initial styles for the text zone
-		overlay.setAttr("contenteditable", "true");
-		overlay.style.position = "absolute";
-		overlay.style.top = "50%";
-		overlay.style.left = "50%";
-		overlay.style.padding = "5px";
-		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
-		overlay.style.border = "2px dashed #0078d7"; // Initial dotted border
-		overlay.style.borderRadius = "4px"; // Rounded corners
-		overlay.style.cursor = "move";
+		// Apply default styles
+		const fontSizeClass = getFontSizeClass(fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px");
+		const fontFamilyClass = getFontFamilyClass(fontFamily || this.plugin.settingsManager.settings.defaultFontFamily || "Arial");
 
-		// Apply custom font styles
-		overlay.style.fontSize = fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px";
-		overlay.style.fontFamily = fontFamily || this.plugin.settingsManager.settings.defaultFontFamily || "Arial";
-		overlay.style.color = color || this.plugin.settingsManager.settings.defaultTextColor || "black";
+		overlay.classList.add(fontSizeClass, fontFamilyClass);
+		// Appliquer la couleur dynamiquement en utilisant une variable CSS
+		const textColor = color || this.plugin.settingsManager.settings.defaultTextColor || "#000000";
+		overlay.style.setProperty("--pdf-text-color", textColor);
 
 		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
-		overlay.addEventListener("dblclick", () => deleteButton.style.display = "block");
-		overlay.addEventListener("mouseleave", () => deleteButton.style.display = "none");
+		overlay.addEventListener("dblclick", () => deleteButton.classList.remove("pdf-delete-button-hidden"));
+		overlay.addEventListener("mouseleave", () => deleteButton.classList.add("pdf-delete-button-hidden"));
 
 		// Delete button functionality
 		deleteButton.addEventListener("click", (event) => {
@@ -69,19 +62,22 @@ export default class TextZoneManager {
 			overlay.remove();
 		});
 
-
-
-		// Ajouter un événement global pour détecter les clics dans le document
+		// Global click event to finalize the text zone
 		const handleClickOutside = (event: MouseEvent) => {
 			const target = event.target as HTMLElement;
 
-			// Vérifier si le clic est en dehors de la zone de texte et de la barre d'outils
+			// Check if the click is outside the text zone and toolbar
 			if (!overlay.contains(target) && !target.closest(".pdf-toolbar")) {
 				this.finalizeTextZone(overlay);
 			}
 		};
 
 		document.addEventListener("click", handleClickOutside);
+
+		// Clean up the event listener when the plugin is unloaded
+		this.plugin.register(() => {
+			document.removeEventListener("click", handleClickOutside);
+		});
 	}
 
 	/**
@@ -103,8 +99,8 @@ export default class TextZoneManager {
 			const newX = e.clientX - containerRect.left - offsetX;
 			const newY = e.clientY - containerRect.top - offsetY;
 
-			overlay.style.left = `${newX}px`;
-			overlay.style.top = `${newY}px`;
+			overlay.style.setProperty("--pdf-overlay-left", `${newX}px`);
+			overlay.style.setProperty("--pdf-overlay-top", `${newY}px`);
 		};
 
 		const onMouseUp = () => {
@@ -122,8 +118,8 @@ export default class TextZoneManager {
 	 */
 	enableTextEditing(overlay: HTMLDivElement) {
 		overlay.setAttr("contenteditable", "true");
-		overlay.style.border = "2px dashed #0078d7"; // Add dotted border on double click
-		overlay.style.backgroundColor = "rgba(255, 255, 255, 0.8)";
+		overlay.classList.remove("pdf-text-overlay-finalize-editing");
+		overlay.classList.add("pdf-text-overlay-editing");
 		overlay.focus();
 	}
 
@@ -139,9 +135,7 @@ export default class TextZoneManager {
 		}
 
 		overlay.setAttr("contenteditable", "false");
-		overlay.style.border = "none"; // Remove border on click outside
-		overlay.style.backgroundColor = "transparent";
-		overlay.style.padding = "0";
+		overlay.classList.add("pdf-text-overlay-finalize-editing");
 		overlay.style.cursor = "default";
 	}
 
@@ -158,17 +152,17 @@ export default class TextZoneManager {
 		const range = selection.getRangeAt(0);
 
 		// Create a span to wrap the selected text with the style
-		const span = document.createElement("span");
+		const span = createEl("span");
 		if (styleType === "fontSize") {
-			span.style.fontSize = value;
+			span.classList.add(`pdf-text-overlay-font-size-${parseInt(value, 14)}`);
 		} else if (styleType === "fontFamily") {
-			span.style.fontFamily = value;
+			span.classList.add(`pdf-text-overlay-font-family-${value.toLowerCase().replace(/ /g, "-")}`);
 		} else if (styleType === "color") {
-			span.style.color = value;
+			span.style.setProperty("--pdf-text-color", value);
+			span.classList.add("pdf-text-color-modified");
 		}
 
 		// Wrap the selected text with the styled span
 		range.surroundContents(span);
 	}
-
 }

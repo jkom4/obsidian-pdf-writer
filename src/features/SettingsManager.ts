@@ -1,8 +1,8 @@
 import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import MyPlugin from "../main";
+import PDFWriter from "../main";
 
 // Plugin settings interface to define the shape of the settings object.
-interface MyPluginSettings {
+interface PDFWriterSettings {
 	mySetting: string; // Example setting: A placeholder string.
 	defaultFontSize: string; // Default font size for text zones.
 	defaultFontFamily: string; // Default font family for text zones.
@@ -12,7 +12,7 @@ interface MyPluginSettings {
 }
 
 // Default values for plugin settings.
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: PDFWriterSettings = {
 	mySetting: 'default', // Default value for "mySetting".
 	defaultFontSize: '14px', // Default font size.
 	defaultFontFamily: 'Arial', // Default font family.
@@ -27,7 +27,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
  */
 class PluginSettingsManager {
 	plugin: Plugin; // Reference to the plugin instance.
-	settings: MyPluginSettings; // Holds the current settings for the plugin.
+	settings: PDFWriterSettings; // Holds the current settings for the plugin.
 
 	constructor(plugin: Plugin) {
 		this.plugin = plugin;
@@ -53,10 +53,10 @@ class PluginSettingsManager {
  * Class for the settings tab UI in Obsidian.
  * Provides a user interface for configuring plugin settings in the settings panel.
  */
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin; // Reference to the main plugin class.
+class PDFWriterSettingTab extends PluginSettingTab {
+	plugin: PDFWriter; // Reference to the main plugin class.
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: PDFWriter) {
 		super(app, plugin);
 		this.plugin = plugin; // Initialize with the main plugin instance.
 	}
@@ -151,4 +151,4 @@ class SampleSettingTab extends PluginSettingTab {
 }
 
 // Export the settings tab and manager for use in the main plugin.
-export { SampleSettingTab, PluginSettingsManager };
+export { PDFWriterSettingTab, PluginSettingsManager };
