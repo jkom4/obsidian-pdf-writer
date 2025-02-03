@@ -17,6 +17,28 @@ export class PdfExporter {
 			const pages = pdfDoc.getPages();
 			const firstPage = pages[0];
 
+			// Fonction pour convertir les coordonnées du navigateur en coordonnées du PDF
+			const convertToPdfCoordinates = (element: HTMLElement, pdfPageHeight: number) => {
+				const rect = element.getBoundingClientRect();
+
+				// Récupérer la position de la page PDF dans le navigateur
+				const pdfPageContainer = document.querySelector(".pdf-container");
+				if (!pdfPageContainer) {
+					throw new Error("PDF page container not found");
+				}
+				const containerRect = pdfPageContainer.getBoundingClientRect();
+
+				// Ajuster les coordonnées en fonction des marges ou du padding
+				const offsetX = containerRect.left;
+				const offsetY = containerRect.top;
+				const toolbarHeight = 13;
+				// Calculer les coordonnées relatives à la page PDF
+				const x = rect.left - offsetX;
+				const y = pdfPageHeight - (rect.bottom - offsetY) - toolbarHeight; // Inverser l'axe Y et ajuster la hauteur
+
+				return { x, y };
+			};
+
 			// Ajouter les zones de texte
 			const textZones = document.querySelectorAll(".text-overlay");
 
@@ -33,13 +55,14 @@ export class PdfExporter {
 
 				// Convertir la couleur en RGB
 				const rgbMatch = color.match(/\d+/g);
-				const [r, g, b] = rgbMatch ? rgbMatch.map(Number) : [0, 0, 0]; // Noir par défaut
-				const { x, y, width, height } = textZone.getBoundingClientRect();
+				const [r, g, b] = rgbMatch ? rgbMatch.map(Number) : [0, 0, 0];
+				// Convertir les coordonnées du navigateur en coordonnées du PDF
+				const { x, y } = convertToPdfCoordinates(textZone as HTMLElement, firstPage.getHeight());
 
 				// Ajouter le texte à la position correspondante
 				firstPage.drawText(text, {
-					x: x, // Position X
-					y: firstPage.getHeight() - y - height, // Calculer Y en inversant l'axe
+					x: x,
+					y: y,
 					size:  parseFloat(fontSize) || 12,
 					color: rgb(r / 255, g / 255, b / 255), // Couleur noire
 				});
@@ -59,4 +82,5 @@ export class PdfExporter {
 			console.error("Error exporting PDF:", error);
 		}
 	}
+
 }
