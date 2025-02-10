@@ -86,7 +86,7 @@ export default class PDFTextZoneManager {
 	handleDrag(event: MouseEvent, overlay: HTMLDivElement, container: Element) {
 		if ((event.target as HTMLElement).isContentEditable) return;
 
-		event.preventDefault();
+		//event.preventDefault();
 		let isDragging = true;
 		const rect = overlay.getBoundingClientRect();
 		const offsetX = event.clientX - rect.left;

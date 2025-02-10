@@ -46,7 +46,7 @@
 	background-color: rgba(255, 255, 255, 0.8); /* Apparence semi-transparente */
 	border: 2px dashed #0078d7; /* Contour en pointillé bleu */
 	border-radius: 4px; /* Coins arrondis */
-	cursor: move; /* Icône de déplacement */
+	cursor: default; /* Icône de déplacement */
 	position: absolute;
 	left: var(--pdf-overlay-left, 50%); /* Utilisation d'une variable CSS */
 	top: var(--pdf-overlay-top, 50%);
@@ -59,11 +59,14 @@
 .pdf-text-overlay-editing {
 	border: 2px dashed #0078d7;
 	background-color: rgba(255, 255, 255, 0.8);
+	cursor: text !important;
+	user-select: text !important;
 }
 .pdf-text-overlay-finalize-editing {
 	border: none;
 	background-color: transparent;
 	padding: 0;
+	cursor: move !important;
 }
 
 .delete-button {
@@ -115,11 +118,16 @@
 .pdf-text-overlay-font-size-24 { font-size: 24px; }
 
 /* Classes pour les familles de police */
-.pdf-text-overlay-font-family-arial { font-family: Arial; }
-.pdf-text-overlay-font-family-verdana { font-family: Verdana; }
-.pdf-text-overlay-font-family-times { font-family: "Times New Roman"; }
-.pdf-text-overlay-font-family-courier { font-family: "Courier New"; }
-.pdf-text-overlay-font-family-georgia { font-family: Georgia; }
+.pdf-text-overlay-font-family-arial {
+	font-family: Arial, serif; }
+.pdf-text-overlay-font-family-verdana {
+	font-family: Verdana, serif; }
+.pdf-text-overlay-font-family-times {
+	font-family: "Times New Roman", serif; }
+.pdf-text-overlay-font-family-courier {
+	font-family: "Courier New", serif; }
+.pdf-text-overlay-font-family-georgia {
+	font-family: Georgia, serif; }
 
 .pdf-text-color-modified {
 	color: var(--pdf-text-color, black); /* Utilisation de la variable CSS */
