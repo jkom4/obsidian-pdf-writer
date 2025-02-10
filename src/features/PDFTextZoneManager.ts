@@ -150,19 +150,64 @@ export default class PDFTextZoneManager {
 		}
 
 		const range = selection.getRangeAt(0);
+		let selectedNode = range.commonAncestorContainer as HTMLElement;
 
-		// Create a span to wrap the selected text with the style
-		const span = createEl("span");
-		if (styleType === "fontSize") {
-			span.classList.add(`pdf-text-overlay-font-size-${parseInt(value, 14)}`);
-		} else if (styleType === "fontFamily") {
-			span.classList.add(`pdf-text-overlay-font-family-${value.toLowerCase().replace(/ /g, "-")}`);
-		} else if (styleType === "color") {
-			span.style.setProperty("--pdf-text-color", value);
-			span.classList.add("pdf-text-color-modified");
+		// Si le nœud sélectionné est un texte, récupérer son parent (potentiellement un <span>)
+		if (selectedNode.nodeType === Node.TEXT_NODE) {
+			selectedNode = selectedNode.parentElement as HTMLElement;
 		}
 
-		// Wrap the selected text with the styled span
-		range.surroundContents(span);
+		// Vérifier si le parent est un <span> modifiable
+		if (selectedNode && selectedNode.tagName === "SPAN") {
+			// Appliquer les classes CSS au <span> existant
+			if (styleType === "fontSize") {
+				selectedNode.classList.forEach((cls) => {
+					if (cls.startsWith("pdf-text-overlay-font-size-")) {
+						selectedNode.classList.remove(cls);
+					}
+				});
+				selectedNode.classList.add(`pdf-text-overlay-font-size-${parseInt(value, 10)}`);
+			} else if (styleType === "fontFamily") {
+				selectedNode.classList.forEach((cls) => {
+					if (cls.startsWith("pdf-text-overlay-font-family-")) {
+						selectedNode.classList.remove(cls);
+					}
+				});
+				selectedNode.classList.add(`pdf-text-overlay-font-family-${value.toLowerCase().replace(/ /g, "-")}`);
+			} else if (styleType === "color") {
+				selectedNode.classList.forEach((cls) => {
+					if (cls.startsWith("pdf-text-color-")) {
+						selectedNode.classList.remove(cls);
+					}
+				});
+				selectedNode.style.setProperty("--pdf-text-color", value);
+				selectedNode.classList.add("pdf-text-color-modified");
+			}
+		} else {
+			// Créer un <span> si aucun n'existe
+			const span = document.createElement("span");
+
+			// Ajouter la classe CSS appropriée
+			if (styleType === "fontSize") {
+				span.classList.add(`pdf-text-overlay-font-size-${parseInt(value, 10)}`);
+			} else if (styleType === "fontFamily") {
+				span.classList.add(`pdf-text-overlay-font-family-${value.toLowerCase().replace(/ /g, "-")}`);
+			} else if (styleType === "color") {
+				span.style.setProperty("--pdf-text-color", value);
+				span.classList.add("pdf-text-color-modified");
+			}
+
+			// Remplacer le texte sélectionné par le nouveau <span>
+			span.appendChild(range.extractContents());
+			range.insertNode(span);
+
+			// Sélectionner à nouveau le texte après application du style
+			selection.removeAllRanges();
+			const newRange = document.createRange();
+			newRange.selectNodeContents(span);
+			selection.addRange(newRange);
+		}
 	}
+
+
 }
