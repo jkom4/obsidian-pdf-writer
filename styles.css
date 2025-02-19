@@ -53,6 +53,7 @@
 	padding: 5px;
 	font-family: Arial, serif;
 	color: var(--pdf-text-color, black);
+
 }
 
 /* Styles for the text overlay when editing */

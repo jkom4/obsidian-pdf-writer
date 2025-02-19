@@ -25,14 +25,30 @@ export default class PDFTextZoneManager {
 			return;
 		}
 
-		const container = activeLeaf.containerEl.querySelector(".page");
-		if (!container) {
-			console.warn("No active or supported file view.");
+		// Trouver la page active (celle qui est visible et interagit avec l'utilisateur)
+		const pages = activeLeaf.containerEl.querySelectorAll(".page");
+		if (!pages.length) {
+			console.warn("No pages found in the active file view.");
+			return;
+		}
+
+		// Déterminer sur quelle page placer le texte (exemple : la page visible)
+		let activePage: HTMLElement ;
+		pages.forEach((page) => {
+			const rect = page.getBoundingClientRect();
+			if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+				activePage = page as HTMLElement;
+			}
+		});
+
+		// @ts-ignore
+		if (!activePage) {
+			console.warn("No active page detected.");
 			return;
 		}
 
 		// Create the text zone (editable div)
-		const overlay = container.createDiv({ cls: "text-overlay", text: "Text here" });
+		const overlay = activePage.createDiv({ cls: "text-overlay", text: "Text here" });
 
 		// Create the delete button
 		const deleteButton = createEl("button", { text: "🗑️", cls: "delete-button pdf-delete-button-hidden" });
@@ -40,6 +56,7 @@ export default class PDFTextZoneManager {
 
 		// Append the delete button to the text zone
 		overlay.appendChild(deleteButton);
+		
 
 		// Apply default styles
 		const fontSizeClass = getFontSizeClass(fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px");
@@ -51,10 +68,11 @@ export default class PDFTextZoneManager {
 		overlay.style.setProperty("--pdf-text-color", textColor);
 
 		// Event listeners for dragging and editing
-		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, container));
+		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, activePage!));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
 		overlay.addEventListener("dblclick", () => deleteButton.classList.remove("pdf-delete-button-hidden"));
 		overlay.addEventListener("mouseleave", () => deleteButton.classList.add("pdf-delete-button-hidden"));
+
 
 		// Delete button functionality
 		deleteButton.addEventListener("click", (event) => {

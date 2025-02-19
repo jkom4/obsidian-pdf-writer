@@ -13,6 +13,16 @@
 - Simple and intuitive settings for customization.
 
 ---
+
+## 📑 How to Use
+1. Open a PDF in Obsidian.
+2. Use the toolbar to select font size, font family, and text color.
+3. Click the **Add Text** button to create a new annotation.
+4. Click on the annotation to edit the text.
+5. **Right-click and drag** to move the annotation to a new position.
+6. Double-click the annotation to reveal the delete button.
+7. Click the delete button to remove the annotation.
+
 ## 🚧 Work in progress notice 📝
 
 ⚠️ **Heads Up!** This plugin is currently in beta development.  

@@ -1,4 +1,5 @@
 import { PDFDocument, rgb } from "pdf-lib";
+import {Notice} from "obsidian";
 
 export class PdfExporter {
 	private currentPdfBytes: ArrayBuffer;
@@ -55,6 +56,7 @@ export class PdfExporter {
 			link.download = "modified-document.pdf";
 			link.click();
 		} catch (error) {
+			new Notice("No PDF is currently loaded!",3000);
 			alert("Error exporting PDF");
 			console.error("Error exporting PDF:", error);
 		}
