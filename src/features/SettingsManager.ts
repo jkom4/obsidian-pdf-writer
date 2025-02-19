@@ -3,7 +3,6 @@ import PDFWriter from "../main";
 
 // Plugin settings interface to define the shape of the settings object.
 interface PDFWriterSettings {
-	mySetting: string; // Example setting: A placeholder string.
 	defaultFontSize: string; // Default font size for text zones.
 	defaultFontFamily: string; // Default font family for text zones.
 	defaultTextColor: string; // Default text color for text zones.
@@ -13,7 +12,6 @@ interface PDFWriterSettings {
 
 // Default values for plugin settings.
 const DEFAULT_SETTINGS: PDFWriterSettings = {
-	mySetting: 'default', // Default value for "mySetting".
 	defaultFontSize: '14px', // Default font size.
 	defaultFontFamily: 'Arial', // Default font family.
 	defaultTextColor: '#000000', // Default text color (black).
@@ -69,17 +67,15 @@ class PDFWriterSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty(); // Clear the container to avoid duplicate UI elements.
-		// Add a header with the plugin name and description
-		containerEl.createEl('h2', { text: 'Obsidian PDF Writer' });
 		containerEl.createEl('p', { text: 'Customize your experience with Obsidian PDF Writer. For more information, visit the documentation.' });
 		containerEl.createEl('a', {
 			href: 'https://github.com/jkom4/obsidian-pdf-writer/blob/main/README.md',
-			text: 'View Documentation',
+			text: 'View documentation',
 			cls: 'docs-link'
 		});
 		// Dropdown for default font size.
 		new Setting(containerEl)
-			.setName('Default Font Size')
+			.setName('Default font size')
 			.setDesc('Choose the default font size for text zones.')
 			.addDropdown(dropdown => dropdown
 				.addOptions({
@@ -97,7 +93,7 @@ class PDFWriterSettingTab extends PluginSettingTab {
 
 		// Dropdown for default font family.
 		new Setting(containerEl)
-			.setName('Default Font Family')
+			.setName('Default font family')
 			.setDesc('Choose the default font family for text zones.')
 			.addDropdown(dropdown => dropdown
 				.addOptions({
@@ -115,7 +111,7 @@ class PDFWriterSettingTab extends PluginSettingTab {
 
 		// Color picker for default text color.
 		new Setting(containerEl)
-			.setName('Default Text Color')
+			.setName('Default text color')
 			.setDesc('Choose the default text color for text zones.')
 			.addColorPicker(colorPicker => colorPicker
 				.setValue(this.plugin.settingsManager.settings.defaultTextColor)
@@ -124,29 +120,7 @@ class PDFWriterSettingTab extends PluginSettingTab {
 					await this.plugin.settingsManager.saveSettings();
 				}));
 
-		// Slider for auto-save interval.
-		new Setting(containerEl)
-			.setName('Auto-Save Interval (minutes)')
-			.setDesc('Set the interval for auto-saving changes.')
-			.addSlider(slider => slider
-				.setLimits(1, 60, 1)
-				.setValue(this.plugin.settingsManager.settings.autoSaveInterval)
-				.setDynamicTooltip()
-				.onChange(async (value) => {
-					this.plugin.settingsManager.settings.autoSaveInterval = value;
-					await this.plugin.settingsManager.saveSettings();
-				}));
 
-		// Toggle for advanced mode.
-		new Setting(containerEl)
-			.setName('Enable Advanced Mode')
-			.setDesc('Enable advanced features and settings.')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settingsManager.settings.enableAdvancedMode)
-				.onChange(async (value) => {
-					this.plugin.settingsManager.settings.enableAdvancedMode = value;
-					await this.plugin.settingsManager.saveSettings();
-				}));
 	}
 }
 
