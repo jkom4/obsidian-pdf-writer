@@ -38,7 +38,7 @@
 	height: 16px;
 	vertical-align: middle;
 }
-.text-overlay {
+.pdf-writer-text-overlay {
 	z-index: 10;
 	pointer-events: auto;
 	font-size: 14px;
@@ -70,7 +70,7 @@
 	cursor: move !important;
 }
 
-.delete-button {
+.pdf-writer-delete-button {
 	position: absolute;
 	top: -20px; /* Ajuste selon ton design */
 	right: -20px; /* Ajuste selon ton design */
@@ -90,13 +90,13 @@
 	line-height: 1; /* Empêcher tout décalage */
 }
 
-.delete-button:hover {
+.pdf-writer-delete-button:hover {
 	transform: scale(1.2); /* Agrandir légèrement au survol */
 	box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* Augmenter l'ombre */
 	background: #ff0000; /* Couleur rouge plus vive */
 }
 
-.delete-button:active {
+.pdf-writer-delete-button:active {
 	transform: scale(1); /* Réduction lors du clic */
 	box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Ombre réduite */
 }

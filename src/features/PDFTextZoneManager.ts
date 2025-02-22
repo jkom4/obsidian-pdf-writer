@@ -48,15 +48,14 @@ export default class PDFTextZoneManager {
 		}
 
 		// Create the text zone (editable div)
-		const overlay = activePage.createDiv({ cls: "text-overlay", text: "Text here" });
+		const overlay = activePage.createDiv({ cls: "pdf-writer-text-overlay", text: "Text here" });
 
 		// Create the delete button
-		const deleteButton = createEl("button", { text: "🗑️", cls: "delete-button pdf-delete-button-hidden" });
+		const deleteButton = createEl("button", { text: "🗑️", cls: "pdf-writer-delete-button pdf-delete-button-hidden" });
 		deleteButton.contentEditable = "false";
 
 		// Append the delete button to the text zone
 		overlay.appendChild(deleteButton);
-		
 
 		// Apply default styles
 		const fontSizeClass = getFontSizeClass(fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px");

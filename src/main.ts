@@ -2,7 +2,6 @@ import {FileView, Plugin, TFile,} from 'obsidian';
 
 import {PluginSettingsManager, PDFWriterSettingTab} from "./features/SettingsManager";
 import PDFToolbarManager from "./features/PDFToolbarManager";
-import {KeyboardCommand} from "./features/KeyboardCommand";
 
 
 
@@ -13,7 +12,6 @@ import {KeyboardCommand} from "./features/KeyboardCommand";
 export default class PDFWriter extends Plugin {
 	currentPdfBytes: ArrayBuffer | null = null;
 	settingsManager: PluginSettingsManager;
-	keyboardCommand: KeyboardCommand;
 	toolbarManager: PDFToolbarManager;
 
 	async onload() {
@@ -79,7 +77,7 @@ export default class PDFWriter extends Plugin {
 		if (this.toolbarManager) {
 			this.toolbarManager.removeToolbarElements(); // Supprime les éléments propres à ton plugin
 		}
-		document.querySelectorAll(".text-overlay").forEach((el) => el.remove());
+		document.querySelectorAll(".pdf-writer-text-overlay").forEach((el) => el.remove());
 		this.app.workspace.trigger("layout-change"); // Forcer un refresh de l'interface
 	}
 
