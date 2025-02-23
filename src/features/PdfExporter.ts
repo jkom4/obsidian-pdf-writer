@@ -19,10 +19,10 @@ export class PdfExporter {
 			const firstPage = pages[0];
 
 			// Ajouter les zones de texte
-			const textZones = document.querySelectorAll(".text-overlay");
+			const textZones = document.querySelectorAll(".pdf-writer-text-overlay");
 
 			textZones.forEach((textZone) => {
-				const deleteButton = textZone.querySelector(".delete-button");
+				const deleteButton = textZone.querySelector(".pdf-writer-delete-button");
 				if (deleteButton) {
 					textZone.removeChild(deleteButton);
 				}

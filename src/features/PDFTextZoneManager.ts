@@ -48,15 +48,14 @@ export default class PDFTextZoneManager {
 		}
 
 		// Create the text zone (editable div)
-		const overlay = activePage.createDiv({ cls: "text-overlay", text: "Text here" });
+		const overlay = activePage.createDiv({ cls: "pdf-writer-text-overlay", text: "Text here" });
 
 		// Create the delete button
-		const deleteButton = createEl("button", { text: "🗑️", cls: "delete-button pdf-delete-button-hidden" });
+		const deleteButton = createEl("button", { text: "🗑️", cls: "pdf-writer-delete-button pdf-writer-delete-button-hidden" });
 		deleteButton.contentEditable = "false";
 
 		// Append the delete button to the text zone
 		overlay.appendChild(deleteButton);
-		
 
 		// Apply default styles
 		const fontSizeClass = getFontSizeClass(fontSize || this.plugin.settingsManager.settings.defaultFontSize || "14px");
@@ -70,8 +69,8 @@ export default class PDFTextZoneManager {
 		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, activePage!));
 		overlay.addEventListener("dblclick", () => this.enableTextEditing(overlay));
-		overlay.addEventListener("dblclick", () => deleteButton.classList.remove("pdf-delete-button-hidden"));
-		overlay.addEventListener("mouseleave", () => deleteButton.classList.add("pdf-delete-button-hidden"));
+		overlay.addEventListener("dblclick", () => deleteButton.classList.remove("pdf-writer-delete-button-hidden"));
+		overlay.addEventListener("mouseleave", () => deleteButton.classList.add("pdf-writer-delete-button-hidden"));
 
 
 		// Delete button functionality
@@ -136,8 +135,8 @@ export default class PDFTextZoneManager {
 	 */
 	enableTextEditing(overlay: HTMLDivElement) {
 		overlay.setAttr("contenteditable", "true");
-		overlay.classList.remove("pdf-text-overlay-finalize-editing");
-		overlay.classList.add("pdf-text-overlay-editing");
+		overlay.classList.remove("pdf-writer-text-overlay-finalize-editing");
+		overlay.classList.add("pdf-writer-text-overlay-editing");
 		overlay.focus();
 	}
 
@@ -153,7 +152,7 @@ export default class PDFTextZoneManager {
 		}
 
 		overlay.setAttr("contenteditable", "false");
-		overlay.classList.add("pdf-text-overlay-finalize-editing");
+		overlay.classList.add("pdf-writer-text-overlay-finalize-editing");
 		overlay.style.cursor = "default";
 	}
 

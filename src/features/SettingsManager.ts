@@ -67,7 +67,7 @@ class PDFWriterSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 
 		containerEl.empty(); // Clear the container to avoid duplicate UI elements.
-		containerEl.createEl('p', { text: 'Customize your experience with Obsidian PDF Writer. For more information, visit the documentation.' });
+		containerEl.createEl('p', { text: 'Customize your experience with PDF Writer. For more information, visit the documentation.' });
 		containerEl.createEl('a', {
 			href: 'https://github.com/jkom4/obsidian-pdf-writer/blob/main/README.md',
 			text: 'View documentation',

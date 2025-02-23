@@ -3,9 +3,8 @@
 	"name": "PDF Writer",
 	"version": "0.10.2",
 	"minAppVersion": "0.15.0",
-	"description": "To write and fill a pdf.",
+	"description": "To write and fill a P.",
 	"author": "Jobelin Kom",
 	"authorUrl": "https://github.com/jkom4",
-	"isDesktopOnly": false,
-	"css": "styles.css"
+	"isDesktopOnly": false
 }
