@@ -29,16 +29,18 @@ export default class PDFToolbarManager {
 			console.warn("Default toolbar not found.");
 			return;
 		}
+		// Ajouter une classe personnalisée à la toolbar
+		defaultToolbar.classList.add("pdf-writer-toolbar");
 
 		// Créer les éléments et les stocker dans `this.toolbarElements`
-		const fontSizeDropdown = defaultToolbar.createEl("select");
+		const fontSizeDropdown = defaultToolbar.createEl("select", { cls: "pdf-writer-toolbar-button" });
 		["12px", "14px", "16px", "18px", "20px", "24px"].forEach(size => {
 			fontSizeDropdown.createEl("option", { text: size, value: size });
 		});
 		fontSizeDropdown.value = this.plugin.settingsManager.settings.defaultFontSize || "16px";
 		this.toolbarElements.push(fontSizeDropdown);
 
-		const fontFamilyDropdown = defaultToolbar.createEl("select");
+		const fontFamilyDropdown = defaultToolbar.createEl("select", { cls: "pdf-writer-toolbar-button" });
 		["Arial", "Verdana", "Times New Roman", "Courier New", "Georgia"].forEach(font => {
 			fontFamilyDropdown.createEl("option", { text: font, value: font });
 		});
@@ -53,7 +55,7 @@ export default class PDFToolbarManager {
 		defaultToolbar.appendChild(colorPicker);
 		this.toolbarElements.push(colorPicker);
 
-		const addTextButton = defaultToolbar.createEl("button", { cls: "pdf-toolbar-button pdf-add-text-button" });
+		const addTextButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
 		setIcon(addTextButton, 'type-outline');
 		this.toolbarElements.push(addTextButton);
 
@@ -61,7 +63,7 @@ export default class PDFToolbarManager {
 			new PDFTextZoneManager(this.plugin).addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
 		});
 
-		const exportButton = defaultToolbar.createEl("button", { cls: "pdf-toolbar-button pdf-export-button" });
+		const exportButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
 		setIcon(exportButton, 'download');
 		this.toolbarElements.push(exportButton);
 

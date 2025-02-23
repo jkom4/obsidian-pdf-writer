@@ -1,30 +1,29 @@
-.pdf-toolbar {
+.pdf-writer-toolbar {
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
 	padding: 5px;
-	background-color: #2e2e2e;
-	color: white;
-	border-bottom: 1px solid #444;
+	background-color: var(--background-secondary);
+	color: var(--text-normal);
+	border-bottom: 1px solid var(--background-modifier-border);
 	z-index: 1000;
 	gap: 0.5rem;
 	margin-right: 1rem;
 }
 
-.pdf-toolbar-button {
+.pdf-writer-toolbar-button {
 	margin: 0 5px;
 	padding: 5px 10px;
-	background-color: #444;
-	color: white;
+	background-color: var(--interactive-normal);
+	color: var(--text-normal);
 	border: none;
 	border-radius: 3px;
 	cursor: pointer;
 }
 
-.pdf-toolbar-button:hover {
-	background-color: #555;
+.pdf-writer-toolbar-button:hover {
+	background-color: var(--interactive-hover);
 }
-
 
 /* Styles for the color picker */
 .pdf-text-color-picker {
@@ -32,11 +31,6 @@
 	padding: 5px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
-}
-.pdf-toolbar-icon {
-	width: 16px;
-	height: 16px;
-	vertical-align: middle;
 }
 .pdf-writer-text-overlay {
 	z-index: 10;
@@ -57,13 +51,13 @@
 }
 
 /* Styles for the text overlay when editing */
-.pdf-text-overlay-editing {
+.pdf-writer-text-overlay-editing {
 	border: 2px dashed #0078d7;
 	background-color: rgba(255, 255, 255, 0.8);
 	cursor: text !important;
 	user-select: text !important;
 }
-.pdf-text-overlay-finalize-editing {
+.pdf-writer-text-overlay-finalize-editing {
 	border: none;
 	background-color: transparent;
 	padding: 0;
@@ -102,12 +96,12 @@
 }
 
 /* Classe pour masquer le bouton */
-.pdf-delete-button-hidden {
+.pdf-writer-delete-button-hidden {
 	display: none;
 }
 
 /* Classe pour afficher le bouton */
-.pdf-delete-button-visible {
+.pdf-writer-delete-button-visible {
 	display: block;
 }
 /* Classes pour les tailles de police */
