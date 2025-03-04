@@ -29,10 +29,15 @@ export default class PDFToolbarManager {
 			console.warn("Default toolbar not found.");
 			return;
 		}
-		// Ajouter une classe personnalisée à la toolbar
+
 		defaultToolbar.classList.add("pdf-writer-toolbar");
 
-		// Créer les éléments et les stocker dans `this.toolbarElements`
+
+		const addTextButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
+		setIcon(addTextButton, 'type-outline');
+		this.toolbarElements.push(addTextButton);
+
+
 		const fontSizeDropdown = defaultToolbar.createEl("select", { cls: "pdf-writer-toolbar-button" });
 		["12px", "14px", "16px", "18px", "20px", "24px"].forEach(size => {
 			fontSizeDropdown.createEl("option", { text: size, value: size });
@@ -54,10 +59,6 @@ export default class PDFToolbarManager {
 		colorPicker.value = this.plugin.settingsManager.settings.defaultTextColor || "#000000";
 		defaultToolbar.appendChild(colorPicker);
 		this.toolbarElements.push(colorPicker);
-
-		const addTextButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
-		setIcon(addTextButton, 'type-outline');
-		this.toolbarElements.push(addTextButton);
 
 		addTextButton.addEventListener("click", () => {
 			new PDFTextZoneManager(this.plugin).addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
