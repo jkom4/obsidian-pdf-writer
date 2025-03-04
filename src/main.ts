@@ -32,13 +32,13 @@ export default class PDFWriter extends Plugin {
 					try {
 						const arrayBuffer = await this.readFileAsArrayBuffer(file);
 
-						// Stocker les données du PDF dans la propriété currentPdfBytes
+
 						this.currentPdfBytes = arrayBuffer;
 
-						// Ajouter la toolbar uniquement si elle n'existe pas déjà
+
 						if (!isToolbarInitialized ) {
 							this.toolbarManager.addToolbarToViewer();
-							isToolbarInitialized = true; // Marquer la toolbar comme initialisée
+							isToolbarInitialized = true;
 						}
 					} catch (error) {
 						console.error("Failed to read PDF file:", error);
@@ -69,16 +69,16 @@ export default class PDFWriter extends Plugin {
 		this.addSettingTab(new PDFWriterSettingTab(this.app, this));
 
 
-		this.app.workspace.trigger("layout-change"); // Forcer un refresh de l'interface
+		this.app.workspace.trigger("layout-change");
 
 	}
 
 	onunload() {
 		if (this.toolbarManager) {
-			this.toolbarManager.removeToolbarElements(); // Supprime les éléments propres à ton plugin
+			this.toolbarManager.removeToolbarElements();
 		}
 		document.querySelectorAll(".pdf-writer-text-overlay").forEach((el) => el.remove());
-		this.app.workspace.trigger("layout-change"); // Forcer un refresh de l'interface
+		this.app.workspace.trigger("layout-change");
 	}
 
 	async readFileAsArrayBuffer(file: TFile): Promise<ArrayBuffer> {

@@ -29,19 +29,20 @@
 Although fully functional, you may encounter:
 
 - Occasional problems with text positioning on the PDF .
-- Limited support for colored fonts (best results with black/dark text).
+- Limited support for colored fonts (only a few fonts available).
 - Slight variations in overlay accuracy depending on PDF resolution.
 
-### Optimal results when :
-- 📜 Using PDFs with bright, contrasting content.
+### Optimum results when :
+- 📜 Using PDFs with bright, high-contrast content.
 - ✍️ Text editing with standard fonts and colors.
 - 💡 Working with clean, high-quality scans.
 
-We're actively working on :  
-- Full support for custom fonts 🎨    
+We are actively working on :
+- Full support for custom fonts 🎨
 - Smarter positioning and scaling 💡
-- Improved UX for even more user-friendly interfaces 🔍
+- Enhanced UX for even more user-friendly interfaces 🔍
 
+Translated with DeepL.com (free version)
 Stay updated on progress →  [GitHub Repository](https://github.com/jkom4/obsidian-pdf-writer)
 
 ---
@@ -59,15 +60,8 @@ Stay updated on progress →  [GitHub Repository](https://github.com/jkom4/obsid
 
 ---
 
-## 🚀 How It Works
-1. Open a PDF from your Obsidian vault.
-2. Access the plugin’s toolbar to begin editing the document.
-3. Save your changes to the PDF directly within Obsidian.
-
----
-
 ## ⚙️ Compatibility
-- **Minimum Obsidian Version**: 0.15.0
+- **Minimum Obsidian Version**: 1.5.8
 - Works on **desktop** and **mobile** platforms.
 
 ---
