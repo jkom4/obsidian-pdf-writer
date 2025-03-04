@@ -25,19 +25,30 @@ export default class PDFTextZoneManager {
 			return;
 		}
 
-		// Trouver la page active (celle qui est visible et interagit avec l'utilisateur)
+		// Get active page
 		const pages = activeLeaf.containerEl.querySelectorAll(".page");
+
 		if (!pages.length) {
 			console.warn("No pages found in the active file view.");
 			return;
 		}
 
-		// Déterminer sur quelle page placer le texte (exemple : la page visible)
 		let activePage: HTMLElement ;
+		let closestToCenter = Infinity;
+
 		pages.forEach((page) => {
 			const rect = page.getBoundingClientRect();
-			if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
-				activePage = page as HTMLElement;
+			const pageCenter = (rect.top + rect.bottom) / 2;
+			const viewportCenter = window.innerHeight / 2;
+
+			// verify active page
+			if (rect.top < window.innerHeight && rect.bottom > 0) {
+				const distanceToCenter = Math.abs(pageCenter - viewportCenter);
+
+				if (distanceToCenter < closestToCenter) {
+					activePage = page as HTMLElement;
+					closestToCenter = distanceToCenter;
+				}
 			}
 		});
 
@@ -46,6 +57,7 @@ export default class PDFTextZoneManager {
 			console.warn("No active page detected.");
 			return;
 		}
+
 
 		// Create the text zone (editable div)
 		const overlay = activePage.createDiv({ cls: "pdf-writer-text-overlay", text: "Text here" });
@@ -62,7 +74,7 @@ export default class PDFTextZoneManager {
 		const fontFamilyClass = getFontFamilyClass(fontFamily || this.plugin.settingsManager.settings.defaultFontFamily || "Arial");
 
 		overlay.classList.add(fontSizeClass, fontFamilyClass);
-		// Appliquer la couleur dynamiquement en utilisant une variable CSS
+		// Apply color with CSS variables
 		const textColor = color || this.plugin.settingsManager.settings.defaultTextColor || "#000000";
 		overlay.style.setProperty("--pdf-text-color", textColor);
 
@@ -169,14 +181,12 @@ export default class PDFTextZoneManager {
 		const range = selection.getRangeAt(0);
 		let selectedNode = range.commonAncestorContainer as HTMLElement;
 
-		// Si le nœud sélectionné est un texte, récupérer son parent (potentiellement un <span>)
+		// Get parent  (<span>)
 		if (selectedNode.nodeType === Node.TEXT_NODE) {
 			selectedNode = selectedNode.parentElement as HTMLElement;
 		}
 
-		// Vérifier si le parent est un <span> modifiable
 		if (selectedNode && selectedNode.tagName === "SPAN") {
-			// Appliquer les classes CSS au <span> existant
 			if (styleType === "fontSize") {
 				selectedNode.classList.forEach((cls) => {
 					if (cls.startsWith("pdf-text-overlay-font-size-")) {
@@ -201,10 +211,10 @@ export default class PDFTextZoneManager {
 				selectedNode.classList.add("pdf-text-color-modified");
 			}
 		} else {
-			// Créer un <span> si aucun n'existe
+			// create a <span> if necessary
 			const span = document.createElement("span");
 
-			// Ajouter la classe CSS appropriée
+
 			if (styleType === "fontSize") {
 				span.classList.add(`pdf-text-overlay-font-size-${parseInt(value, 10)}`);
 			} else if (styleType === "fontFamily") {
@@ -214,11 +224,10 @@ export default class PDFTextZoneManager {
 				span.classList.add("pdf-text-color-modified");
 			}
 
-			// Remplacer le texte sélectionné par le nouveau <span>
+
 			span.appendChild(range.extractContents());
 			range.insertNode(span);
 
-			// Sélectionner à nouveau le texte après application du style
 			selection.removeAllRanges();
 			const newRange = document.createRange();
 			newRange.selectNodeContents(span);
