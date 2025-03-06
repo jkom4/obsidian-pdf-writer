@@ -1,4 +1,4 @@
-import { FileView } from 'obsidian';
+import {FileView} from 'obsidian';
 import PDFWriter from "../main";
 import {getFontFamilyClass, getFontSizeClass} from "../utils/Styles";
 
@@ -17,15 +17,20 @@ export default class PDFTextZoneManager {
 	 * @param fontSize - The font size of the text zone.
 	 * @param fontFamily - The font family of the text zone.
 	 * @param color - The text color of the text zone.
+	 * @param position
+	 * @param text
 	 */
-	addTextZone(fontSize: string, fontFamily: string, color: string) {
+	addTextZone(fontSize?: string, fontFamily?: string, color?: string, pageIndex?: number, position?: {
+		x: number;
+		y: number
+	}, text?: string) {
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
 			console.warn("No active or supported file view.");
 			return;
 		}
 
-		// Get active page
+		// Get all pages
 		const pages = activeLeaf.containerEl.querySelectorAll(".page");
 
 		if (!pages.length) {
@@ -33,37 +38,42 @@ export default class PDFTextZoneManager {
 			return;
 		}
 
-		let activePage: HTMLElement ;
+		let activePage: HTMLElement;
+
 		let closestToCenter = Infinity;
+		if (pageIndex !== undefined && pageIndex >= 0 && pageIndex < pages.length) {
+			activePage = pages[pageIndex] as HTMLElement;
+		} else {
+			pages.forEach((page) => {
+				const rect = page.getBoundingClientRect();
+				const pageCenter = (rect.top + rect.bottom) / 2;
+				const viewportCenter = window.innerHeight / 2;
 
-		pages.forEach((page) => {
-			const rect = page.getBoundingClientRect();
-			const pageCenter = (rect.top + rect.bottom) / 2;
-			const viewportCenter = window.innerHeight / 2;
+				// verify active page
+				if (rect.top < window.innerHeight && rect.bottom > 0) {
+					const distanceToCenter = Math.abs(pageCenter - viewportCenter);
 
-			// verify active page
-			if (rect.top < window.innerHeight && rect.bottom > 0) {
-				const distanceToCenter = Math.abs(pageCenter - viewportCenter);
-
-				if (distanceToCenter < closestToCenter) {
-					activePage = page as HTMLElement;
-					closestToCenter = distanceToCenter;
+					if (distanceToCenter < closestToCenter) {
+						activePage = page as HTMLElement;
+						closestToCenter = distanceToCenter;
+					}
 				}
-			}
-		});
-
+			});
+		}
 		// @ts-ignore
 		if (!activePage) {
 			console.warn("No active page detected.");
 			return;
 		}
 
-
 		// Create the text zone (editable div)
-		const overlay = activePage.createDiv({ cls: "pdf-writer-text-overlay", text: "Text here" });
+		const overlay = activePage.createDiv({cls: "pdf-writer-text-overlay", text: text || "Text here"});
 
 		// Create the delete button
-		const deleteButton = createEl("button", { text: "🗑️", cls: "pdf-writer-delete-button pdf-writer-delete-button-hidden" });
+		const deleteButton = createEl("button", {
+			text: "🗑️",
+			cls: "pdf-writer-delete-button pdf-writer-delete-button-hidden"
+		});
 		deleteButton.contentEditable = "false";
 
 		// Append the delete button to the text zone
@@ -77,6 +87,12 @@ export default class PDFTextZoneManager {
 		// Apply color with CSS variables
 		const textColor = color || this.plugin.settingsManager.settings.defaultTextColor || "#000000";
 		overlay.style.setProperty("--pdf-text-color", textColor);
+
+		// Restore position if exist
+		if (position) {
+			overlay.style.setProperty("--pdf-overlay-left", `${position.x}px`);
+			overlay.style.setProperty("--pdf-overlay-top", `${position.y}px`);
+		}
 
 		// Event listeners for dragging and editing
 		overlay.addEventListener("mousedown", (event) => this.handleDrag(event, overlay, activePage!));
@@ -236,4 +252,44 @@ export default class PDFTextZoneManager {
 	}
 
 
+	async loadAnnotations() {
+		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
+		if (!activeLeaf) {
+			console.warn("No active or supported file view.");
+			return;
+		}
+
+		const annotationFile = `${this.plugin.file.path}.annotations.json`;
+
+		let annotations = [];
+		try {
+			const data = await this.plugin.app.vault.adapter.read(annotationFile);
+			annotations = JSON.parse(data);
+		} catch (e) {
+			console.warn("Aucune annotation trouvée pour ce fichier.");
+		}
+
+		if (!annotations || annotations.length === 0) {
+			console.warn("Aucune annotation valide trouvée.");
+			return;
+		}
+
+		// On boucle sur les annotations récupérées et on les ajoute
+		for (const annotation of annotations) {
+			if (annotation.fontSize && annotation.fontFamily && annotation.color && annotation.position && annotation.text) {
+				setTimeout(() => {
+					this.addTextZone(
+						annotation.fontSize,
+						annotation.fontFamily,
+						annotation.color,
+						annotation.pageIndex,
+						annotation.position,
+						annotation.text
+					);
+				}, 100);
+			} else {
+				console.warn("Annotation invalide :", annotation);
+			}
+		}
+	}
 }

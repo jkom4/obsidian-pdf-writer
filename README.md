@@ -22,6 +22,8 @@
 5. **Right-click and drag** to move the annotation to a new position.
 6. Double-click the annotation to reveal the delete button.
 7. Click the delete button to remove the annotation.
+8. Click the **Save** button to store your annotations.
+9. Annotations are automatically reloaded when reopening the PDF or switching windows.
 
 ## 🚧 Work in progress notice 📝
 
@@ -42,7 +44,6 @@ We are actively working on :
 - Smarter positioning and scaling 💡
 - Enhanced UX for even more user-friendly interfaces 🔍
 
-Translated with DeepL.com (free version)
 Stay updated on progress →  [GitHub Repository](https://github.com/jkom4/obsidian-pdf-writer)
 
 ---

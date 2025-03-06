@@ -42,8 +42,8 @@
 	border-radius: 4px; /* Coins arrondis */
 	cursor: default; /* Icône de déplacement */
 	position: absolute;
-	left: var(--pdf-overlay-left, 50%); /* Utilisation d'une variable CSS */
-	top: var(--pdf-overlay-top, 50%);
+	left: var(--pdf-overlay-left, 30%); /* Utilisation d'une variable CSS */
+	top: var(--pdf-overlay-top, 30%);
 	padding: 5px;
 	font-family: Arial, serif;
 	color: var(--pdf-text-color, black);

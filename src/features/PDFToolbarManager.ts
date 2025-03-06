@@ -1,6 +1,5 @@
 import {FileView, Notice,setIcon} from 'obsidian';
 import PDFWriter from "../main";
-import PDFTextZoneManager from "./PDFTextZoneManager";
 import {PdfExporter} from "./PdfExporter";
 
 /**
@@ -61,10 +60,23 @@ export default class PDFToolbarManager {
 		this.toolbarElements.push(colorPicker);
 
 		addTextButton.addEventListener("click", () => {
-			new PDFTextZoneManager(this.plugin).addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
+			this.plugin.textZoneManager.addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
 		});
 
-		const exportButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
+		const saveButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
+		setIcon(saveButton, 'save');
+		this.toolbarElements.push(saveButton);
+
+		saveButton.addEventListener("click", async () => {
+			if (!this.plugin.currentPdfBytes) {
+				this.myNotice.setMessage("No PDF is currently loaded!");
+				return;
+			}
+			const exporter = new PdfExporter(this.plugin);
+			await exporter.saveAnnotationsToFile();
+		});
+
+			const exportButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
 		setIcon(exportButton, 'download');
 		this.toolbarElements.push(exportButton);
 
@@ -73,13 +85,13 @@ export default class PDFToolbarManager {
 				this.myNotice.setMessage("No PDF is currently loaded!");
 				return;
 			}
-			const exporter = new PdfExporter(this.plugin.currentPdfBytes);
+			const exporter = new PdfExporter(this.plugin);
 			await exporter.exportPdfWithTextZones();
 		});
 		// Event listeners for applying styles to the selected text
-		fontSizeDropdown.addEventListener("change", () => new PDFTextZoneManager(this.plugin).applyStyleToSelection("fontSize", fontSizeDropdown.value));
-		fontFamilyDropdown.addEventListener("change", () => new PDFTextZoneManager(this.plugin).applyStyleToSelection("fontFamily", fontFamilyDropdown.value));
-		colorPicker.addEventListener("input", () => new PDFTextZoneManager(this.plugin).applyStyleToSelection("color", colorPicker.value));
+		fontSizeDropdown.addEventListener("change", () => this.plugin.textZoneManager.applyStyleToSelection("fontSize", fontSizeDropdown.value));
+		fontFamilyDropdown.addEventListener("change", () => this.plugin.textZoneManager.applyStyleToSelection("fontFamily", fontFamilyDropdown.value));
+		colorPicker.addEventListener("input", () => this.plugin.textZoneManager.applyStyleToSelection("color", colorPicker.value));
 
 		// Clean up event listeners when the plugin is unloaded
 		this.plugin.register(() => {
