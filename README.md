@@ -25,7 +25,7 @@
 8. Click the **Save** button to store your annotations.
 9. Annotations are automatically reloaded when reopening the PDF or switching windows.
 
-![Demo GIF](https://github.com/jkom4/obsidian-pdf-writer/assets/tutoPDFWriter.gif)
+[Demo GIF](https://github.com/jkom4/obsidian-pdf-writer/assets/tutoPDFWriter.gif)
 
 ## 🚧 Work in progress notice 📝
 
