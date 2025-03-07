@@ -2,6 +2,7 @@ import {FileView, Plugin, TFile,} from 'obsidian';
 
 import {PluginSettingsManager, PDFWriterSettingTab} from "./features/SettingsManager";
 import PDFToolbarManager from "./features/PDFToolbarManager";
+import PDFTextZoneManager from "./features/PDFTextZoneManager";
 
 
 
@@ -13,10 +14,13 @@ export default class PDFWriter extends Plugin {
 	currentPdfBytes: ArrayBuffer | null = null;
 	settingsManager: PluginSettingsManager;
 	toolbarManager: PDFToolbarManager;
+	file : TFile;
+	textZoneManager: PDFTextZoneManager;
 
 	async onload() {
 
 
+		this.textZoneManager = new PDFTextZoneManager(this);
 		this.settingsManager = new PluginSettingsManager(this);
 		await this.settingsManager.loadSettings();
 
@@ -31,9 +35,8 @@ export default class PDFWriter extends Plugin {
 				if (file && file.extension === "pdf") {
 					try {
 						const arrayBuffer = await this.readFileAsArrayBuffer(file);
-
-
 						this.currentPdfBytes = arrayBuffer;
+						this.file = file;
 
 
 						if (!isToolbarInitialized ) {
@@ -54,6 +57,7 @@ export default class PDFWriter extends Plugin {
 			this.app.workspace.on("file-open", async (file: TFile | null) => {
 				if (file && file.extension === "pdf") {
 					await initializeToolbarIfNeeded();
+					await this.textZoneManager.loadAnnotations();
 				}
 			})
 		);
@@ -61,7 +65,11 @@ export default class PDFWriter extends Plugin {
 		// Listen to active tab changes
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", async () => {
-				await initializeToolbarIfNeeded();
+				if(this.file && this.file.extension === "pdf") {
+					await initializeToolbarIfNeeded();
+					await this.textZoneManager.loadAnnotations();
+				}
+
 			})
 		);
 

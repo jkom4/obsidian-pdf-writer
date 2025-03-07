@@ -1,7 +1,7 @@
 {
 	"id": "pdf-writer",
 	"name": "PDF Writer",
-	"version": "0.10.3",
+	"version": "0.11.0",
 	"minAppVersion": "1.5.8",
 	"description": "To write and fill a PDF.",
 	"author": "Jobelin Kom",
