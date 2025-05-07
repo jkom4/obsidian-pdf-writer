@@ -27,6 +27,11 @@
 
 ![Demo GIF](https://github.com/jkom4/obsidian-pdf-writer/blob/main/assets/tutoPDFWriter.gif)
 
+## 🖱️ Important Note:
+In most cases, right-click and drag is used to move annotations.
+For certain PDF files, left-click may also work, depending on how the PDF is rendered in Obsidian.
+If you experience issues with left-click, try right-click instead, which works consistently across all PDFs.
+
 ## 🚧 Work in progress notice 📝
 
 ⚠️ **Heads Up!** This plugin is currently in beta development.  
