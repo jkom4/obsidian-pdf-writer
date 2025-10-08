@@ -128,4 +128,20 @@
 	color: var(--pdf-text-color, black); /* Utilisation de la variable CSS */
 }
 
+.pdf-writer-placement-hint {
+	position: fixed;
+	top: 20px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #222;
+	color: white;
+	padding: 6px 10px;
+	border-radius: 6px;
+	font-size: 14px;
+	z-index: 99999;
+	opacity: 0.9;
+	pointer-events: none;
+}
+
+
 
