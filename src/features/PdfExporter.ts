@@ -11,58 +11,56 @@ export class PdfExporter {
 
 	async exportPdfWithTextZones(): Promise<void> {
 		try {
-			// Load the active PDF document
 			const pdfDoc = await PDFDocument.load(this.pdfWriterPlugin.currentPdfBytes!);
 			const pages = pdfDoc.getPages();
 
-			// Get all text overlays
+			// Sélection de toutes les zones de texte visibles sur le PDF
 			const textZones = document.querySelectorAll(".pdf-writer-text-overlay");
-			textZones.forEach((textZone) => {
-				// Remove delete button if it exists
-				const deleteButton = textZone.querySelector(".pdf-writer-delete-button");
-				if (deleteButton) {
-					textZone.removeChild(deleteButton);
-				}
 
-				const text = textZone.textContent?.trim() || "";
+			textZones.forEach((textZone) => {
+				// Supprimer le bouton de suppression pour éviter de le dessiner
+				const deleteButton = textZone.querySelector(".pdf-writer-delete-button");
+				if (deleteButton) deleteButton.remove();
+
+				const text = textZone.textContent?.trim();
 				if (!text) return;
 
-				// Extract styling properties
+				// --- Extraire les styles appliqués ---
 				const styles = window.getComputedStyle(textZone);
 				const fontSize = parseFloat(styles.fontSize) || 12;
-				const color = styles.color.match(/\d+/g);
-				const [r, g, b] = color ? color.map(Number) : [0, 0, 0]; // Default to black
+				const fontColor = styles.color.match(/\d+/g);
+				let [r, g, b] = fontColor ? fontColor.map(Number) : [0, 0, 0];
+				r /= 255; g /= 255; b /= 255;
 
-				// Get bounding box position
-				const rect = textZone.getBoundingClientRect();
-				if (!rect) return;
-
-				// Identify the page number based on the closest ".page" container
+				// --- Déterminer la page correspondante ---
 				const pageElement = textZone.closest(".page");
 				const pageIndex = pageElement
 					? Array.from(document.querySelectorAll(".page")).indexOf(pageElement)
-					: 0; // Default to the first page if not found
-				// Ensure the page index is within the valid range
-				if (pageIndex < 0 || pageIndex >= pages.length) return;
+					: 0;
 
-				const targetPage = pages[pageIndex];
+				if (pageIndex < 0 || pageIndex >= pages.length) return;
+				const page = pages[pageIndex];
+
+				// --- Convertir les coordonnées DOM en coordonnées PDF ---
+				const rect = textZone.getBoundingClientRect();
 				// @ts-ignore
 				const pageRect = pageElement.getBoundingClientRect();
 
-				const x = (rect.left - pageRect.left) * (targetPage.getWidth() / pageRect.width);
-				const y = targetPage.getHeight() - ((rect.top - pageRect.top) * (targetPage.getHeight() / pageRect.height)) ;
+				// Conversion des coordonnées relatives à la page PDF
+				const x = (rect.left - pageRect.left) * (page.getWidth() / pageRect.width);
+				const y = page.getHeight() -
+					((rect.top - pageRect.top) * (page.getHeight() / pageRect.height)) - fontSize;
 
-
-				// Draw text on the correct PDF page
-				targetPage.drawText(text, {
+				// --- Dessiner le texte sur la page PDF ---
+				page.drawText(text, {
 					x,
 					y,
-					size: fontSize,
-					color: rgb(r / 255, g / 255, b / 255),
+					size: fontSize, // utilise la vraie taille en points
+					color: rgb(r, g, b),
 				});
 			});
 
-			// Save and download the modified PDF
+			// --- Sauvegarder le PDF modifié ---
 			const pdfBytesModified = await pdfDoc.save();
 			const blob = new Blob([pdfBytesModified], { type: "application/pdf" });
 
@@ -70,12 +68,14 @@ export class PdfExporter {
 			link.href = URL.createObjectURL(blob);
 			link.download = "modified-document.pdf";
 			link.click();
+
+			new Notice("PDF successfully exported  ", 3000);
 		} catch (error) {
-			new Notice("No PDF is currently loaded!", 3000);
-			alert("Error exporting PDF");
-			console.error("Error exporting PDF:", error);
+			new Notice("Error when exporting PDF ", 3000);
+			console.error("PDF export error:", error);
 		}
 	}
+
 	async saveAnnotationsToFile() {
 		// Charger le document PDF
 		const pdfDoc = await PDFDocument.load(this.pdfWriterPlugin.currentPdfBytes!);
@@ -139,6 +139,7 @@ export class PdfExporter {
 		// Sauvegarder les annotations dans un fichier JSON
 		const data = JSON.stringify(annotations, null, 2);
 		await this.pdfWriterPlugin.app.vault.adapter.write(annotationFile, data);
+		new Notice("Saved successfully  ", 3000);
 	}
 
 

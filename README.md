@@ -80,7 +80,7 @@ This plugin is licensed under the [MIT License](https://github.com/jkom4/obsidia
 ---
 
 ## ✨ Credits
-- **Author**: [Jobelin Kom](https://github.com/jkom4)
+- **Author**: [Jobelin Kom](https://www.linkedin.com/in/jobelin-kom)
 - Developed as a voluntary project to assist the Obsidian community.
 
 ---
@@ -92,7 +92,7 @@ Contributions are welcome! If you’d like to suggest improvements, report bugs,
 
 ---
 
-## ❤️ Support
+##  Issues
 If you encounter any issues or need assistance:
 - Check the [Issues](https://github.com/jkom4/obsidian-pdf-writer/issues) tab for help.
 - Contact the author via GitHub.
@@ -101,7 +101,7 @@ If you encounter any issues or need assistance:
 
 ## ⭐ Show Your Support
 If you find this plugin useful, please consider leaving a ⭐ on the [repository](https://github.com/jkom4/obsidian-pdf-writer)! It helps the project grow and reach more users.
-
+<a href='https://ko-fi.com/F2F21MIS45' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 Found a bug? Have feature ideas?
 
 📧 [My Email](mailto://jkom4dev@gmail.com)

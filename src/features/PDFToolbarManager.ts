@@ -59,9 +59,18 @@ export default class PDFToolbarManager {
 		defaultToolbar.appendChild(colorPicker);
 		this.toolbarElements.push(colorPicker);
 
+
 		addTextButton.addEventListener("click", () => {
-			this.plugin.textZoneManager.addTextZone(fontSizeDropdown.value, fontFamilyDropdown.value, colorPicker.value);
+			// Active le mode placement manuel
+			this.plugin.textZoneManager.waitForClickToAddTextZone(
+				fontSizeDropdown.value,
+				fontFamilyDropdown.value,
+				colorPicker.value,
+				undefined,
+				"Text Here"
+			);
 		});
+
 
 		const saveButton = defaultToolbar.createEl("button", { cls: "pdf-writer-toolbar-button" });
 		setIcon(saveButton, 'save');
