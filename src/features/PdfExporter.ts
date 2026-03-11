@@ -1,5 +1,5 @@
 import { PDFDocument, rgb } from "pdf-lib";
-import {Notice, TFile} from "obsidian";
+import { Notice } from "obsidian";
 import PDFWriter from "../main";
 
 export class PdfExporter {
@@ -9,31 +9,85 @@ export class PdfExporter {
 		this.pdfWriterPlugin = pdfWriterPlugin;
 	}
 
+	// ─── Helpers ────────────────────────────────────────────────────────────────
+
+	private extractText(el: HTMLElement): string {
+		const clone = el.cloneNode(true) as HTMLElement;
+		clone.querySelector(".pdf-writer-delete-button")?.remove();
+		return Array.from(clone.childNodes)
+			.map((node: ChildNode) => {
+				if (node.nodeName === "BR") return "\n";
+				if (node.nodeName === "DIV") return "\n" + (node as HTMLElement).innerText;
+				return (node as HTMLElement).innerText ?? node.textContent ?? "";
+			})
+			.join("")
+			.trim();
+	}
+
+	private extractStyles(el: HTMLElement): { fontSize: string; fontFamily: string; color: string } {
+		const spanChild = el.querySelector("span") as HTMLElement | null;
+		const styleSource = spanChild || el;
+
+		// fontSize
+		let fontSize = this.pdfWriterPlugin.settingsManager.settings.defaultFontSize || "14px";
+		styleSource.classList.forEach((cls) => {
+			const match = cls.match(/^pdf-text-overlay-font-size-(\d+)$/);
+			if (match) fontSize = `${match[1]}px`;
+		});
+		if (fontSize === (this.pdfWriterPlugin.settingsManager.settings.defaultFontSize || "14px")) {
+			const computed = window.getComputedStyle(styleSource).fontSize;
+			if (computed) fontSize = computed;
+		}
+
+		// fontFamily
+		let fontFamily = this.pdfWriterPlugin.settingsManager.settings.defaultFontFamily || "Arial";
+		styleSource.classList.forEach((cls) => {
+			const match = cls.match(/^pdf-text-overlay-font-family-(.+)$/);
+			if (match) fontFamily = match[1].replace(/-/g, " ");
+		});
+
+		// color
+		const colorSpan = el.querySelector(".pdf-text-color-modified") as HTMLElement | null;
+		const color =
+			colorSpan?.style.getPropertyValue("--pdf-text-color")?.trim() ||
+			el.style.getPropertyValue("--pdf-text-color")?.trim() ||
+			this.pdfWriterPlugin.settingsManager.settings.defaultTextColor ||
+			"#000000";
+
+		return { fontSize, fontFamily, color };
+	}
+
+	private hexToRgb(hex: string): { r: number; g: number; b: number } {
+		const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result
+			? {
+				r: parseInt(result[1], 16) / 255,
+				g: parseInt(result[2], 16) / 255,
+				b: parseInt(result[3], 16) / 255,
+			}
+			: { r: 0, g: 0, b: 0 };
+	}
+
+	// ─── Export ─────────────────────────────────────────────────────────────────
+
 	async exportPdfWithTextZones(): Promise<void> {
 		try {
 			const pdfDoc = await PDFDocument.load(this.pdfWriterPlugin.currentPdfBytes!);
 			const pages = pdfDoc.getPages();
-
-			// Sélection de toutes les zones de texte visibles sur le PDF
-			const textZones = document.querySelectorAll(".pdf-writer-text-overlay");
+			const textZones = document.querySelectorAll<HTMLElement>(".pdf-writer-text-overlay");
 
 			textZones.forEach((textZone) => {
-				// Supprimer le bouton de suppression pour éviter de le dessiner
-				const deleteButton = textZone.querySelector(".pdf-writer-delete-button");
-				if (deleteButton) deleteButton.remove();
+				if (textZone.classList.contains("pdf-writer-text-overlay-empty")) return;
 
-				const text = textZone.textContent?.trim();
+				const text = this.extractText(textZone);
 				if (!text) return;
 
-				// --- Extraire les styles appliqués ---
-				const styles = window.getComputedStyle(textZone);
-				const fontSize = parseFloat(styles.fontSize) || 12;
-				const fontColor = styles.color.match(/\d+/g);
-				let [r, g, b] = fontColor ? fontColor.map(Number) : [0, 0, 0];
-				r /= 255; g /= 255; b /= 255;
+				const { fontSize: fontSizeStr, color } = this.extractStyles(textZone);
+				const fontSize = parseFloat(fontSizeStr) || 12;
+				const lineHeight = fontSize * 1.2;
+				const { r, g, b } = this.hexToRgb(color);
 
-				// --- Déterminer la page correspondante ---
-				const pageElement = textZone.closest(".page");
+				const pageElement = textZone.closest(".page") as HTMLElement | null;
 				const pageIndex = pageElement
 					? Array.from(document.querySelectorAll(".page")).indexOf(pageElement)
 					: 0;
@@ -41,107 +95,80 @@ export class PdfExporter {
 				if (pageIndex < 0 || pageIndex >= pages.length) return;
 				const page = pages[pageIndex];
 
-				// --- Convertir les coordonnées DOM en coordonnées PDF ---
 				const rect = textZone.getBoundingClientRect();
-				// @ts-ignore
-				const pageRect = pageElement.getBoundingClientRect();
+				const pageRect = pageElement!.getBoundingClientRect();
 
-				// Conversion des coordonnées relatives à la page PDF
 				const x = (rect.left - pageRect.left) * (page.getWidth() / pageRect.width);
-				const y = page.getHeight() -
-					((rect.top - pageRect.top) * (page.getHeight() / pageRect.height)) - fontSize;
+				const baseY =
+					page.getHeight() -
+					((rect.top - pageRect.top) * (page.getHeight() / pageRect.height)) -
+					fontSize;
 
-				// --- Dessiner le texte sur la page PDF ---
-				page.drawText(text, {
-					x,
-					y,
-					size: fontSize, // utilise la vraie taille en points
-					color: rgb(r, g, b),
+				text.split("\n").forEach((line, index) => {
+					if (!line.trim()) return;
+					page.drawText(line, {
+						x,
+						y: baseY - index * lineHeight,
+						size: fontSize,
+						color: rgb(r, g, b),
+					});
 				});
 			});
 
-			// --- Sauvegarder le PDF modifié ---
 			const pdfBytesModified = await pdfDoc.save();
 			const blob = new Blob([pdfBytesModified], { type: "application/pdf" });
-
 			const link = document.createElement("a");
 			link.href = URL.createObjectURL(blob);
 			link.download = "modified-document.pdf";
 			link.click();
 
-			new Notice("PDF successfully exported  ", 3000);
+			new Notice("PDF successfully exported", 3000);
 		} catch (error) {
-			new Notice("Error when exporting PDF ", 3000);
+			new Notice("Error when exporting PDF", 3000);
 			console.error("PDF export error:", error);
 		}
 	}
 
+	// ─── Save ────────────────────────────────────────────────────────────────────
+
 	async saveAnnotationsToFile() {
-		// Charger le document PDF
 		const pdfDoc = await PDFDocument.load(this.pdfWriterPlugin.currentPdfBytes!);
 		const pages = pdfDoc.getPages();
 
-		// Sélectionner toutes les zones de texte
-		const textZones = document.querySelectorAll(".pdf-writer-text-overlay");
+		const textZones = document.querySelectorAll<HTMLElement>(".pdf-writer-text-overlay");
 		const annotationFile = `${this.pdfWriterPlugin.file.path}.annotations.json`;
+		const annotations: any[] = [];
 
-		const annotations: any[] = []; // Liste pour stocker toutes les annotations
+		textZones.forEach((el) => {
+			if (el.classList.contains("pdf-writer-text-overlay-empty")) return;
 
-		textZones.forEach((textZone) => {
-			// Retirer le bouton de suppression s'il existe
-			const deleteButton = textZone.querySelector(".pdf-writer-delete-button");
-			if (deleteButton) {
-				textZone.removeChild(deleteButton);
-			}
-
-			const text = textZone.textContent?.trim() || "";
+			const text = this.extractText(el);
 			if (!text) return;
 
-			// Extraire les styles (taille et couleur)
-			const styles = window.getComputedStyle(textZone);
-			const fontSize = parseFloat(styles.fontSize) || 12;
-			const fontFamily = styles.fontFamily;
-			const color = styles.color.match(/\d+/g);
-			const [r, g, b] = color ? color.map(Number) : [0, 0, 0]; // Noir par défaut
-			const hexColor = `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+			const { fontSize, fontFamily, color } = this.extractStyles(el);
 
-			// Récupérer la position du texte
-			const rect = textZone.getBoundingClientRect();
-			if (!rect) return;
+			const baseX = parseFloat(el.dataset.baseX || "0");
+			const baseY = parseFloat(el.dataset.baseY || "0");
 
-			// Identifier la page cible
-			const pageElement = textZone.closest(".page");
+			const pageElement = el.closest(".page");
 			const pageIndex = pageElement
 				? Array.from(document.querySelectorAll(".page")).indexOf(pageElement)
 				: 0;
 
-
 			if (pageIndex < 0 || pageIndex >= pages.length) return;
 
-
-			//const targetPage = pages[pageIndex];
-			// @ts-ignore
-			const pageRect = pageElement.getBoundingClientRect();
-			const x = (rect.x - pageRect.x) ;
-			const y = (rect.y - pageRect.y) ;
-
-			// Add annotations
 			annotations.push({
 				text,
 				fontSize,
 				fontFamily,
-				color: hexColor,
+				color,
 				pageIndex,
-				position: { x, y }
+				position: { x: baseX, y: baseY },
 			});
 		});
 
-		// Sauvegarder les annotations dans un fichier JSON
 		const data = JSON.stringify(annotations, null, 2);
 		await this.pdfWriterPlugin.app.vault.adapter.write(annotationFile, data);
-		new Notice("Saved successfully  ", 3000);
+		new Notice("Saved successfully", 3000);
 	}
-
-
-
 }

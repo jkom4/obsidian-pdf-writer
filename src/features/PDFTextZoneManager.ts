@@ -33,14 +33,14 @@ export default class PDFTextZoneManager {
 				return;
 			}
 
-			// Calcul de la position du clic relatif à la page
+			// calcul relative position in page
 			const rect = page.getBoundingClientRect();
 			const x = event.clientX - rect.left;
 			const y = event.clientY - rect.top;
 
 			this.addTextZone(fontSize, fontFamily, color, Array.from(page.parentElement?.children || []).indexOf(page), { x, y }, text);
 
-			// nettoyage
+			// cleanup
 			document.removeEventListener("click", handleClick, true);
 			hint.remove();
 			document.body.style.cursor = "default";
@@ -52,7 +52,7 @@ export default class PDFTextZoneManager {
 
 
 	/* -----------------------
-   Helpers : attach target / positions normalisées
+   Helpers : attach target / normalization
    ----------------------- */
 	findAttachTarget(page: HTMLElement): HTMLElement {
 		const media = page.querySelector('canvas, img, svg');
@@ -66,11 +66,11 @@ export default class PDFTextZoneManager {
 			if (cs.transform && cs.transform !== 'none') return el;
 		}
 
-		// 3) fallback : attacher directement à la page
+
 		return page;
 	}
 	/* -----------------------
-	   Observers : reattach quand PDF.js re-render
+	   Observers : reattach when PDF.js re-render
 	   ----------------------- */
 	observePageRender(page: HTMLElement) {
 		if ((page as any).__pdfWriterRenderObserverAttached) return;
@@ -78,7 +78,7 @@ export default class PDFTextZoneManager {
 		const mo = new MutationObserver((mutations) => {
 			for (const m of mutations) {
 				if (m.type === "childList") {
-					// dès qu'un enfant (canvas/wrapper) change, ré-attache les overlays
+					// when PDF.js re-renders, it often replaces the canvas element
 					this.reattachOverlays(page);
 					break;
 				}
@@ -87,7 +87,7 @@ export default class PDFTextZoneManager {
 
 		mo.observe(page, { childList: true, subtree: true });
 
-		// cleanup quand le plugin est désenregistré
+		// cleanup
 		this.plugin.register(() => mo.disconnect());
 		(page as any).__pdfWriterRenderObserverAttached = true;
 	}
@@ -95,9 +95,7 @@ export default class PDFTextZoneManager {
 
 
 
-	/* -----------------------
-	   addTextZone (remplacée)
-	   ----------------------- */
+
 	addTextZone(fontSize?: string, fontFamily?: string, color?: string, pageIndex?: number, position?: { x: number; y: number }, text?: string) {
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
@@ -142,7 +140,15 @@ export default class PDFTextZoneManager {
 		// create DOM node (native, plus compatible avec marshalling)
 		const overlay = document.createElement("div");
 		overlay.classList.add("pdf-writer-text-overlay");
-		overlay.textContent = text || "Text here";
+		if (text) {
+			text.split("\n").forEach((line, index) => {
+				if (index > 0) overlay.appendChild(document.createElement("br"));
+				overlay.appendChild(document.createTextNode(line));
+			});
+		} else {
+			overlay.setAttribute("data-placeholder", "Text here");
+			overlay.classList.add("pdf-writer-text-overlay-empty");
+		}
 		overlay.setAttribute("contenteditable", "false");
 
 		// delete button
@@ -229,8 +235,9 @@ export default class PDFTextZoneManager {
 
 
 	/**
-	 * Rend une zone de texte déplaçable sur sa page.
-	 * (Wrapper de handleDrag pour éviter d'empiler plusieurs listeners)
+	 *  This function is a wrapper around handleDrag to avoid stacking multiple listeners on the same element.
+	 *  It sets up the necessary event listeners for dragging the text zone and ensures that only one set of listeners is active at a time.
+	 *
 	 */
 	makeTextZoneDraggable(overlay: HTMLElement, container: HTMLElement) {
 		let isDragging = false;
@@ -243,11 +250,10 @@ export default class PDFTextZoneManager {
 			if ((event.target as HTMLElement).isContentEditable) return;
 
 			isDragging = true;
-			const rect = overlay.getBoundingClientRect();
 			startX = event.clientX;
 			startY = event.clientY;
 
-			// On récupère la position actuelle (à partir des variables CSS)
+
 			initialLeft = parseFloat(overlay.style.getPropertyValue("--pdf-overlay-left") || "0");
 			initialTop = parseFloat(overlay.style.getPropertyValue("--pdf-overlay-top") || "0");
 
@@ -265,7 +271,7 @@ export default class PDFTextZoneManager {
 			const newLeft = initialLeft + dx;
 			const newTop = initialTop + dy;
 
-			// 🔥 Mise à jour avec les variables CSS
+
 			overlay.style.setProperty("--pdf-overlay-left", `${newLeft}px`);
 			overlay.style.setProperty("--pdf-overlay-top", `${newTop}px`);
 		};
@@ -274,8 +280,6 @@ export default class PDFTextZoneManager {
 			if (!isDragging) return;
 			isDragging = false;
 
-			// Tu peux sauvegarder la nouvelle position ici
-			// pour que loadAnnotations() recharge avec la bonne position.
 			const newX = parseFloat(overlay.style.getPropertyValue("--pdf-overlay-left"));
 			const newY = parseFloat(overlay.style.getPropertyValue("--pdf-overlay-top"));
 
@@ -291,7 +295,7 @@ export default class PDFTextZoneManager {
 	}
 
 
-	/** --- UTILITAIRE : met à jour left/top en pixel depuis les coords normalisées (0..1) --- */
+
 	updateOverlayPositionFromNormalized(overlay: HTMLElement, attachTarget: HTMLElement) {
 		const baseX = parseFloat(overlay.dataset.baseX || "0");
 		const baseY = parseFloat(overlay.dataset.baseY || "0");
@@ -304,41 +308,38 @@ export default class PDFTextZoneManager {
 		overlay.style.position = "absolute";
 		overlay.style.transformOrigin = "top left";
 
-		// stockage auxiliaire si besoin (debug)
+
 		overlay.dataset._lastPixelLeft = px.toString();
 		overlay.dataset._lastPixelTop = py.toString();
 	}
 
-	/* -----------------------
-	   handleDrag (remplacée) — met à jour les coords NORMALISÉES en live
-	   ----------------------- */
+
 	handleDrag(event: MouseEvent, overlay: HTMLElement, page: HTMLElement, attachTarget: HTMLElement) {
-		// si on édite, ne pas déclencher le drag
+
 		if ((event.target as HTMLElement).isContentEditable) return;
 		event.preventDefault();
 
 		let isDragging = true;
 
-		// rects de référence
+
 		const parentRect = attachTarget.getBoundingClientRect();
 		const startRect = overlay.getBoundingClientRect();
 
-		// offset pour que la souris garde la même position relative lors du drag
 		const offsetX = event.clientX - startRect.left;
 		const offsetY = event.clientY - startRect.top;
 
 		const onMouseMove = (e: MouseEvent) => {
 			if (!isDragging) return;
 
-			// nouvelle position en pixels relative à attachTarget
+
 			const newX = e.clientX - parentRect.left - offsetX;
 			const newY = e.clientY - parentRect.top - offsetY;
 
-			// applique directement en inline (visuel immédiat)
+
 			overlay.style.left = `${newX}px`;
 			overlay.style.top = `${newY}px`;
 
-			// ET on met à jour les coords normalisées immédiatement (important si reattach arrive)
+
 			overlay.dataset.baseX = (newX / parentRect.width).toString();
 			overlay.dataset.baseY = (newY / parentRect.height).toString();
 		};
@@ -347,7 +348,6 @@ export default class PDFTextZoneManager {
 			if (!isDragging) return;
 			isDragging = false;
 
-			// safety: recalcul final (au cas où parentRect a changé)
 			const updatedParentRect = attachTarget.getBoundingClientRect();
 			const left = parseFloat(overlay.style.left || "0");
 			const top = parseFloat(overlay.style.top || "0");
@@ -357,9 +357,7 @@ export default class PDFTextZoneManager {
 			document.removeEventListener("mousemove", onMouseMove);
 			document.removeEventListener("mouseup", onMouseUp);
 
-			// Optionnel : si tu veux auto-sauvegarder après chaque déplacement, appelle l'exporteur ici.
-			// const exporter = new PdfExporter(this.plugin);
-			// exporter.saveAnnotationsToFile(); // ou ta méthode de persistance
+
 		};
 
 		document.addEventListener("mousemove", onMouseMove);
@@ -372,11 +370,9 @@ export default class PDFTextZoneManager {
 		const overlays = page.querySelectorAll<HTMLElement>(".pdf-writer-text-overlay");
 
 		overlays.forEach((overlay) => {
-			// si l'overlay est dans un parent différent, on le recolle au bon attachTarget
 			if (overlay.parentElement !== attachTarget) {
 				attachTarget.appendChild(overlay);
 			}
-			// positionne depuis les coords normalisées
 			this.updateOverlayPositionFromNormalized(overlay, attachTarget);
 		});
 	}
@@ -392,18 +388,11 @@ export default class PDFTextZoneManager {
 		overlays.forEach((overlay) => {
 			this.updateOverlayPositionFromNormalized(overlay, attachTarget);
 
-			// Si tu veux que le texte garde la même taille visuelle (non-scalé),
-			// désactive la mise à l'échelle héritée en appliquant l'inverse :
-			// const transform = window.getComputedStyle(attachTarget).transform;
-			// const match = /matrix\\(|scale\\(([^)]+)\\)/.exec(transform);
-			// const scale = match ? parseFloat(match[1]) : 1;
-			// overlay.style.transform = `scale(${1/scale})`;
+
 		});
 	}
 
-	/* -----------------------
-	   loadAnnotations (adaptée)
-	   ----------------------- */
+
 	async loadAnnotations() {
 		const activeLeaf = this.plugin.app.workspace.getActiveViewOfType(FileView);
 		if (!activeLeaf) {
